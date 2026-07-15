@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21384603.svg)](https://doi.org/10.5281/zenodo.21384603)
+
 # RealityOS
 
 > **RealityOS is not an application, nor an AI platform. It is a computational model for representing, understanding, predicting, and coordinating the evolving reality of organizations through evidence-backed events, relationships, and time.**
