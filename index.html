@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0B0E14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RealityOS">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>RealityOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<style>
+  :root{--ink:#0B0E14;--panel:#141A24;--panel-2:#1B2230;--panel-3:#222B3A;--line:#262F3E;
+    --text:#EAEEF3;--muted:#8C97A7;--faint:#5A6573;--amber:#FFB23E;--amber-soft:rgba(255,178,62,.12);
+    --teal:#34D1BF;--teal-soft:rgba(52,209,191,.12);--red:#FF5C5C;--red-soft:rgba(255,92,92,.12);
+    --violet:#9A8CF7;--green:#54D98C;--display:'Space Grotesk',system-ui,sans-serif;--body:'Inter',system-ui,sans-serif;
+    --mono:'JetBrains Mono',monospace;--r:16px;--maxw:520px;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--ink);color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+  body{max-width:var(--maxw);margin:0 auto;min-height:100dvh;position:relative;background:radial-gradient(130% 50% at 50% -10%,rgba(255,178,62,.06),transparent 55%),var(--ink)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  button{font-family:inherit;cursor:pointer}::-webkit-scrollbar{width:0;height:0}
+  .topbar{position:sticky;top:0;z-index:30;backdrop-filter:blur(14px);background:linear-gradient(var(--ink),rgba(11,14,20,.8));padding:calc(env(safe-area-inset-top) + 13px) 18px 12px;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:10px}.mark{width:25px;height:25px;flex:none}
+  .brand h1{font-family:var(--display);font-size:16px;font-weight:600;margin:0;letter-spacing:.2px}
+  .brand .biz{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);font-family:var(--mono);max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pulse{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2.4s infinite;flex:none}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,209,191,.5)}70%{box-shadow:0 0 0 7px rgba(52,209,191,0)}100%{box-shadow:0 0 0 0 transparent}}
+  main{padding:18px 16px 112px;min-height:60vh}
+  .view{display:none;animation:fade .25s ease}.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);margin:0 0 4px}
+  .h2{font-family:var(--display);font-size:23px;font-weight:600;margin:0 0 2px;line-height:1.12}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 16px;line-height:1.4}
+  .sectlabel{font-family:var(--mono);font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);margin:22px 2px 10px;display:flex;align-items:center;gap:8px}
+  .sectlabel .ln{flex:1;height:1px;background:var(--line)}
+  /* time-travel */
+  .timetravel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;margin-bottom:14px}
+  .timetravel .tl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:9px}
+  .timetravel .now{font-family:var(--mono);color:var(--teal)}.timetravel .now.past{color:var(--amber)}
+  input[type=range]{width:100%;accent-color:var(--amber)}
+  /* kpis */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:11px 8px;text-align:center}
+  .kpi .kv{font-family:var(--display);font-size:21px;font-weight:600;line-height:1}
+  .kpi .kl{font-size:9.5px;color:var(--muted);margin-top:5px;text-transform:uppercase;letter-spacing:.5px}
+  .kpi.alert .kv{color:var(--red)}
+  /* risk */
+  .risk{position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:11px}
+  .risk::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sev,var(--amber))}
+  .rhead{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .rtitle{font-family:var(--display);font-weight:600;font-size:15px;line-height:1.25;flex:1}
+  .prob{font-family:var(--mono);font-weight:700;font-size:16px;color:var(--sev,var(--amber));white-space:nowrap}
+  .prob small{display:block;font-size:8px;color:var(--faint);font-weight:500;letter-spacing:1px;text-align:right}
+  .meter{height:4px;border-radius:4px;background:var(--line);overflow:hidden;margin:0 0 10px}.meter i{display:block;height:100%;background:var(--sev,var(--amber))}
+  .why{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0}.why b{color:var(--text);font-weight:600}
+  /* decide */
+  .act{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
+  .act .at{font-family:var(--display);font-weight:600;font-size:15px;margin-bottom:6px}
+  .act .ar{font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:9px}
+  .act .ax{display:flex;gap:8px;background:var(--teal-soft);border:1px solid rgba(52,209,191,.3);border-radius:11px;padding:9px 11px;font-size:12.5px;color:var(--text);line-height:1.4}
+  .act .ax .lbl{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--teal);text-transform:uppercase;flex:none;padding-top:1px}
+  .act .meta{display:flex;gap:14px;margin-top:9px;font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+  /* timeline */
+  .tline{position:relative;padding-left:18px}
+  .tline::before{content:"";position:absolute;left:4px;top:4px;bottom:4px;width:1px;background:var(--line)}
+  .tev{position:relative;padding:0 0 14px}
+  .tev::before{content:"";position:absolute;left:-17px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--panel-3);border:2px solid var(--amber)}
+  .tev.dim::before{border-color:var(--faint)}
+  .tev .tt{font-size:13px;font-weight:500}.tev .td{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:2px}
+  /* objects */
+  .seg{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px;overflow-x:auto}
+  .seg button{flex:none;white-space:nowrap;background:none;border:none;color:var(--muted);font-size:12.5px;font-weight:600;padding:8px 13px;border-radius:9px}
+  .seg button.on{background:var(--panel-3);color:var(--text)}
+  .toolbar{display:flex;gap:8px;margin-bottom:13px}
+  .toolbar .tb{flex:1;background:var(--amber-soft);border:1px dashed rgba(255,178,62,.4);color:var(--amber);border-radius:11px;padding:11px;font-weight:600;font-size:12.5px}
+  .toolbar .tb.alt{background:var(--panel-2);border:1px solid var(--line);color:var(--text)}
+  .obj{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;margin-bottom:9px;display:flex;align-items:center;gap:12px}
+  .obj .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .obj .om{flex:1;min-width:0}.obj .ot{font-weight:600;font-size:14px}.obj .od{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px}
+  .badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.5px;padding:3px 8px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
+  .badge.active{color:var(--teal);background:var(--teal-soft)}.badge.blocked{color:var(--red);background:var(--red-soft)}
+  .badge.done{color:var(--muted);background:var(--panel-3)}.badge.cancelled{color:var(--faint);background:var(--panel-3)}
+  .empty{text-align:center;color:var(--faint);font-size:13px;padding:40px 20px;line-height:1.6}
+  /* ask */
+  .messages{display:flex;flex-direction:column;gap:13px;min-height:calc(100dvh - 250px);padding-bottom:8px}
+  .msg{max-width:92%;font-size:14px;line-height:1.5}
+  .msg.user{align-self:flex-end;background:var(--amber);color:#0B0E14;font-weight:500;padding:10px 14px;border-radius:16px 16px 4px 16px}
+  .msg.bot{align-self:flex-start;width:100%}
+  .answer{background:var(--panel);border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:14px}
+  .answer p{margin:0 0 8px;line-height:1.55}.answer p:last-child{margin:0}.answer b{color:var(--amber);font-weight:600}
+  .answer ul{margin:6px 0;padding-left:18px}.answer li{margin:3px 0;font-size:13px;color:var(--muted)}
+  .dataline{font-family:var(--mono);font-size:12px;color:var(--teal);background:var(--teal-soft);border-radius:8px;padding:7px 10px;margin:8px 0 0;display:inline-block}
+  .conf{display:flex;align-items:center;gap:8px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+  .conf .lbl{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--faint);text-transform:uppercase}
+  .conf .bar{flex:1;height:4px;background:var(--line);border-radius:4px;overflow:hidden}.conf .bar i{display:block;height:100%;background:var(--teal)}
+  .conf .pct{font-family:var(--mono);font-size:11px;color:var(--teal);font-weight:600}
+  .suggest{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
+  .qchip{font-size:12.5px;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:8px 13px}
+  .qchip:active{border-color:var(--amber);color:var(--amber)}
+  .askbar{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 66px);left:0;right:0;max-width:var(--maxw);margin:0 auto;padding:8px 12px;background:linear-gradient(transparent,var(--ink) 32%)}
+  .askinput{display:flex;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:6px 6px 6px 16px;align-items:center}
+  .askinput input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--body);font-size:14px;padding:8px 0}
+  .askinput input::placeholder{color:var(--faint)}
+  .send{width:38px;height:38px;border-radius:50%;border:none;background:var(--amber);color:#0B0E14;font-size:18px;flex:none}
+  .typing{display:flex;gap:4px;padding:6px 2px}.typing span{width:6px;height:6px;border-radius:50%;background:var(--faint);animation:bob 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes bob{0%,60%,100%{opacity:.3}30%{opacity:1}}
+  /* simulate */
+  .simopt{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+  .simopt .sm{flex:1}.simopt .sn{font-weight:600;font-size:14px}.simopt .sd{font-size:12px;color:var(--muted);margin-top:2px}
+  .runbtn{background:var(--violet);color:#0B0E14;border:none;border-radius:10px;padding:9px 14px;font-weight:600;font-size:12.5px;flex:none}
+  .simresult{background:var(--panel);border:1px solid var(--violet);border-radius:var(--r);padding:16px;margin-bottom:12px}
+  .simresult .srt{font-family:var(--display);font-weight:600;font-size:15px;margin-bottom:12px}
+  .deltarow{display:flex;align-items:center;gap:10px;margin:10px 0}
+  .deltarow .dn{flex:1;font-size:13px}
+  .barpair{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px}
+  .barpair .b1{color:var(--muted)}.barpair .arrow{color:var(--faint)}.barpair .b2{color:var(--teal);font-weight:700}
+  .deltapill{font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .deltapill.up{color:var(--green);background:rgba(84,217,140,.12)}.deltapill.down{color:var(--red);background:var(--red-soft)}
+  /* connect / pricing / settings */
+  .conn{display:flex;align-items:center;gap:13px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;margin-bottom:9px}
+  .conn .ic{width:36px;height:36px;border-radius:9px;background:var(--panel-2);display:grid;place-items:center;font-size:17px;flex:none}
+  .conn .cn{font-weight:600;font-size:14px}.conn .cs{font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+  .cbtn{margin-left:auto;border:1px solid var(--line);background:var(--panel-2);color:var(--text);border-radius:9px;padding:7px 13px;font-size:12px;font-weight:600;flex:none}
+  .cbtn.on{background:var(--teal-soft);border-color:rgba(52,209,191,.4);color:var(--teal)}
+  .keybox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+  .keyrow{display:flex;gap:8px;align-items:center;background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--teal);margin-top:8px;overflow:hidden}
+  .keyrow span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.keyrow button{background:var(--panel-3);border:none;color:var(--text);border-radius:7px;padding:5px 10px;font-size:11px;flex:none}
+  pre.code{background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.6;margin:10px 0 0}
+  .code .t{color:var(--teal)}.code .a{color:var(--amber)}
+  .note{background:var(--amber-soft);border:1px solid rgba(255,178,62,.3);border-radius:var(--r);padding:13px;font-size:12.5px;color:var(--muted);line-height:1.6;margin-top:6px}.note b{color:var(--amber)}
+  /* pricing */
+  .plan{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:12px;position:relative}
+  .plan.feat{border-color:var(--amber);background:linear-gradient(var(--amber-soft),transparent)}
+  .plan .pn{font-family:var(--display);font-weight:600;font-size:17px}
+  .plan .pp{font-family:var(--display);font-size:30px;font-weight:700;margin:6px 0 2px}.plan .pp small{font-size:13px;color:var(--muted);font-weight:400}
+  .plan .pd{font-size:12px;color:var(--muted);margin-bottom:12px}
+  .plan ul{list-style:none;margin:0 0 16px;padding:0}.plan li{font-size:13px;color:var(--text);padding:5px 0 5px 22px;position:relative}
+  .plan li::before{content:"✓";position:absolute;left:0;color:var(--teal);font-weight:700}
+  .plan .buy{width:100%;border:none;border-radius:11px;padding:13px;font-weight:600;font-size:14px;background:var(--panel-3);color:var(--text)}
+  .plan.feat .buy{background:var(--amber);color:#0B0E14}
+  .ribbon{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);background:var(--amber-soft);border:1px solid rgba(255,178,62,.4);border-radius:20px;padding:3px 9px}
+  .field{margin-bottom:14px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
+  .field input,.field select,.modal input,.modal select{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;color:var(--text);font-family:var(--body);font-size:14px;outline:none}
+  .field input:focus,.modal input:focus,.modal select:focus{border-color:var(--amber)}
+  .btnrow{display:flex;gap:9px;margin-top:8px}
+  .btn{flex:1;border:none;border-radius:11px;padding:13px;font-weight:600;font-size:13.5px}
+  .btn.primary{background:var(--amber);color:#0B0E14}.btn.ghost{background:var(--panel-2);border:1px solid var(--line);color:var(--text)}.btn.danger{background:var(--red-soft);border:1px solid rgba(255,92,92,.4);color:var(--red)}
+  /* onboarding */
+  .onb{padding:34px 22px 40px}.onb .logo{display:flex;justify-content:center;margin-bottom:20px}
+  .onb h1{font-family:var(--display);font-size:27px;font-weight:700;text-align:center;margin:0 0 10px;line-height:1.12}
+  .onb h1 .hl{color:var(--amber)}
+  .onb .tag{text-align:center;color:var(--muted);font-size:14px;margin:0 0 24px;line-height:1.55}
+  .prim{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 22px}
+  .prim div{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:11px 6px;text-align:center}
+  .prim .pe{font-size:17px}.prim .pl{font-size:9px;color:var(--muted);margin-top:5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px}
+  /* modal */
+  .sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;animation:fade .2s}.sheet.open{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:22px 22px 0 0;width:100%;max-width:var(--maxw);padding:20px 18px calc(env(safe-area-inset-bottom) + 20px);max-height:88dvh;overflow-y:auto;animation:up .28s cubic-bezier(.2,.9,.3,1)}
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  .modal .mt{font-family:var(--display);font-size:18px;font-weight:600;margin:0 0 16px;display:flex;align-items:center}
+  .modal .mt .x{margin-left:auto;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);width:32px;height:32px;border-radius:9px;font-size:16px}
+  .grabber{width:38px;height:4px;border-radius:4px;background:var(--line);margin:-6px auto 14px}
+  .ctxwhy{background:var(--panel-2);border-radius:11px;padding:12px;margin-bottom:12px}.ctxwhy li{font-size:13px;color:var(--text);margin:5px 0;line-height:1.45}
+  .quickacts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .quickacts button{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600}
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;max-width:var(--maxw);margin:0 auto;z-index:40;display:flex;background:rgba(11,14,20,.92);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:8px 4px calc(env(safe-area-inset-bottom) + 8px)}
+  .tab{flex:1;background:none;border:none;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 0;font-size:10px;font-weight:500}
+  .tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7}.tab.active{color:var(--amber)}.tab.active svg{stroke:var(--amber)}
+  .hidden{display:none!important}
+  .toast{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:var(--panel-3);border:1px solid var(--line);color:var(--text);padding:11px 18px;border-radius:30px;font-size:13px;z-index:80;opacity:0;transition:.25s;pointer-events:none;max-width:90%;text-align:center}
+  .toast.show{opacity:1;bottom:140px}
+</style>
+</head>
+<body>
+
+<header class="topbar hidden" id="topbar">
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 26 26"><g fill="none"><line x1="3" y1="16" x2="23" y2="16" stroke="#262F3E" stroke-width="1.4"/><path d="M5 16 A8 8 0 0 1 21 16" stroke="#FFB23E" stroke-width="2"/><path d="M8 16 A5 5 0 0 1 18 16" stroke="#2c3647" stroke-width="1.4"/><circle cx="13" cy="16" r="1.6" fill="#FFB23E"/><circle cx="18.6" cy="16" r="1.8" fill="#34D1BF"/></g></svg>
+    <h1>RealityOS</h1><span class="biz"><span class="pulse"></span><span id="bizName">—</span></span>
+  </div>
+</header>
+
+<main>
+  <!-- ONBOARDING -->
+  <section id="onboard" class="view active">
+    <div class="onb">
+      <div class="logo"><svg width="56" height="56" viewBox="0 0 26 26"><g fill="none"><line x1="3" y1="16" x2="23" y2="16" stroke="#262F3E" stroke-width="1.2"/><path d="M5 16 A8 8 0 0 1 21 16" stroke="#FFB23E" stroke-width="1.8"/><path d="M8 16 A5 5 0 0 1 18 16" stroke="#2c3647" stroke-width="1.2"/><circle cx="13" cy="16" r="1.4" fill="#FFB23E"/><circle cx="18.6" cy="16" r="1.6" fill="#34D1BF"/></g></svg></div>
+      <h1>The operating system for <span class="hl">organizational reality</span>.</h1>
+      <p class="tag">RealityOS models everything your organization is and does as one living graph — then tells you what's about to happen, and what to do about it.</p>
+      <div class="prim">
+        <div><div class="pe">⬡</div><div class="pl">Objects</div></div>
+        <div><div class="pe">⚡</div><div class="pl">Events</div></div>
+        <div><div class="pe">↔</div><div class="pl">Relations</div></div>
+        <div><div class="pe">◷</div><div class="pl">Time</div></div>
+      </div>
+      <div class="field"><label>Name your workspace</label><input id="bizInput" placeholder="e.g. STMZ Kinetic"></div>
+      <div class="btnrow">
+        <button class="btn ghost" id="startEmpty">Start blank</button>
+        <button class="btn primary" id="startSample">Start with a live example</button>
+      </div>
+      <p style="text-align:center;font-size:11px;color:var(--faint);margin-top:14px">The example is a real object/event graph you can inspect, simulate, and wipe — not canned screenshots.</p>
+    </div>
+  </section>
+
+  <!-- HOME / REALITY -->
+  <section id="home" class="view">
+    <p class="eyebrow" id="homeEb">Reality · live</p>
+    <h2 class="h2" id="homeTitle">Your reality, right now</h2>
+    <p class="sub">Everything derived live from the event log.</p>
+    <div class="timetravel">
+      <div class="tl"><span>Time machine</span><span class="now" id="ttLabel">now</span></div>
+      <input type="range" id="ttSlider" min="0" max="14" value="0" step="1">
+    </div>
+    <div class="kpis" id="kpiGrid"></div>
+    <div class="sectlabel"><span>Understanding — what's at risk</span><span class="ln"></span></div>
+    <div id="riskList"></div>
+    <div class="sectlabel"><span>Decide — recommended actions</span><span class="ln"></span></div>
+    <div id="decideList"></div>
+    <div class="sectlabel"><span>Timeline — what happened</span><span class="ln"></span></div>
+    <div class="tline" id="timeline"></div>
+  </section>
+
+  <!-- OBJECTS -->
+  <section id="objects" class="view">
+    <p class="eyebrow">The graph</p>
+    <h2 class="h2">Objects &amp; relationships</h2>
+    <p class="sub">Everything that exists. Tap any object to see why it's in its state.</p>
+    <div class="toolbar"><button class="tb" id="addObj">+ Object</button><button class="tb alt" id="addRel">+ Relationship</button></div>
+    <div class="seg" id="typeSeg"></div>
+    <div id="objList"></div>
+  </section>
+
+  <!-- REASON -->
+  <section id="reason" class="view">
+    <p class="eyebrow">Reason</p>
+    <h2 class="h2">Ask your reality</h2>
+    <p class="sub">Context, understanding, and prediction — computed from the graph, with confidence.</p>
+    <div class="messages" id="messages"></div>
+  </section>
+
+  <!-- SIMULATE -->
+  <section id="simulate" class="view">
+    <p class="eyebrow">Simulate</p>
+    <h2 class="h2">What if?</h2>
+    <p class="sub">Inject a hypothetical event. RealityOS re-derives the future and shows the real difference.</p>
+    <div id="simResult"></div>
+    <div class="sectlabel"><span>Try a scenario</span><span class="ln"></span></div>
+    <div id="simOptions"></div>
+  </section>
+
+  <!-- MORE -->
+  <section id="more" class="view">
+    <p class="eyebrow">More</p>
+    <h2 class="h2">Connect, billing &amp; settings</h2>
+    <p class="sub">Bring in data, manage your plan, control your workspace.</p>
+
+    <div class="sectlabel"><span>Connect your data</span><span class="ln"></span></div>
+    <div class="keybox">
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">Pipe events from anything</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.5">Your website, app, POS, or any tool can post events into your reality with this key. Everything becomes Objects / Events / Relationships / Time — no per-tool connectors.</div>
+      <div class="keyrow"><span id="apiKey">—</span><button id="copyKey">Copy</button></div>
+      <pre class="code" id="snippet"></pre>
+      <button class="btn ghost" id="simWebhook" style="margin-top:10px">Simulate an incoming event →</button>
+    </div>
+    <div id="connList"></div>
+
+    <div class="sectlabel"><span>Plans &amp; billing</span><span class="ln"></span></div>
+    <div id="planList"></div>
+    <div class="note">Secure checkout by <b>Paddle</b> (merchant of record — handles global tax &amp; compliance). Live payments activate once your Paddle client token and price IDs are set in <span style="font-family:var(--mono)">CONFIG</span>. Until then, checkout opens in safe sandbox mode.</div>
+
+    <div class="sectlabel"><span>Workspace</span><span class="ln"></span></div>
+    <div class="field"><label>Workspace name</label><input id="setName"></div>
+    <button class="btn primary" id="saveName" style="width:100%">Save</button>
+    <div class="btnrow"><button class="btn ghost" id="exportData">Export reality (JSON)</button><button class="btn ghost" id="reseed">Reload example</button></div>
+    <div class="btnrow"><button class="btn danger" id="resetAll">Reset everything</button></div>
+
+    <div class="sectlabel"><span>Help</span><span class="ln"></span></div>
+    <div class="note" style="background:var(--panel);border-color:var(--line)">
+      <b style="color:var(--text)">Documentation</b> ships in this package (DOCUMENTATION.md) and the full spec is in REALITYOS_SPECIFICATION.md.<br>
+      Support: <b>support@stmzkinetic.com</b>
+    </div>
+  </section>
+</main>
+
+<div class="askbar hidden" id="askbar"><div class="askinput"><input id="askInput" placeholder="Ask: what's at risk? why is QA stuck?" autocomplete="off"><button class="send" id="sendBtn">↑</button></div></div>
+
+<nav class="tabs hidden" id="tabs">
+  <button class="tab" data-go="home"><svg viewBox="0 0 24 24"><path d="M3 18 A9 9 0 0 1 21 18"/><line x1="3" y1="18" x2="21" y2="18"/></svg>Reality</button>
+  <button class="tab" data-go="objects"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="7" r="2.4"/><circle cx="12" cy="18" r="2.4"/><line x1="7.7" y1="7.4" x2="10.4" y2="16"/><line x1="16.4" y1="8.6" x2="13.4" y2="16.2"/><line x1="8.2" y1="6.3" x2="15.7" y2="6.7"/></svg>Graph</button>
+  <button class="tab" data-go="reason"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg>Reason</button>
+  <button class="tab" data-go="simulate"><svg viewBox="0 0 24 24"><path d="M4 17l5-5-5-5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Simulate</button>
+  <button class="tab" data-go="more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>More</button>
+</nav>
+
+<div class="sheet" id="sheet"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   RealityOS — Reality Engine v2 (reference implementation)
+   The universal substrate: Objects · Events · Relationships · Time.
+   v2 adds the FOUNDATIONS: Ontology, Laws (enforced), Identity, Evidence,
+   Confidence, Causality, Intent/Goal graph, Memory tiers, Attention,
+   Economics, Permissions. Pure, dependency-free, browser + Node.
+   Backward compatible with v1 (same public methods + return shapes).
+   ===================================================================== */
+(function (root) {
+  const DAY = 86400000;
+  const now = () => Date.now();
+  const uid = (p = '') => p + Math.random().toString(36).slice(2, 10);
+  const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+  const daysBetween = (a, b) => Math.round((b - a) / DAY);
+
+  /* ONTOLOGY — every object type belongs somewhere (open; unknown -> entity) */
+  const ONTOLOGY = {
+    entity: null,
+    human: 'entity', person: 'human', ai_agent: 'entity', organization: 'entity',
+    team: 'organization', customer: 'organization',
+    machine: 'entity', robot: 'machine', sensor: 'machine', vehicle: 'machine',
+    asset: 'entity', repo: 'asset', resource: 'entity', location: 'entity', building: 'location',
+    document: 'entity', code: 'document', note: 'document', product: 'entity', service: 'entity',
+    intent: 'entity', goal: 'intent', process: 'entity', project: 'process', task: 'process',
+    meeting: 'process', invoice: 'document', event_note: 'note',
+  };
+  function ancestors(type) { const out = []; let t = ONTOLOGY[type] !== undefined ? type : 'entity'; while (t) { out.push(t); t = ONTOLOGY[t]; } return out; }
+  function isA(type, anc) { return ancestors(type).includes(anc); }
+  function normalizeType(type) { return ONTOLOGY[type] !== undefined ? type : 'entity'; }
+
+  const REL_TYPES = {
+    depends_on: { inverse: 'enables', cat: 'sequence' }, blocks: { inverse: 'blocked_by', cat: 'sequence' },
+    blocked_by: { inverse: 'blocks', cat: 'sequence' }, advances: { inverse: 'advanced_by', cat: 'intent' },
+    belongs_to: { inverse: 'contains', cat: 'structure' }, part_of: { inverse: 'has_part', cat: 'structure' },
+    owns: { inverse: 'owned_by', cat: 'responsibility' }, committed_to: { inverse: 'commits', cat: 'intent' },
+    implements: { inverse: 'implemented_by', cat: 'work' }, fixes: { inverse: 'fixed_by', cat: 'work' },
+    causes: { inverse: 'caused_by', cat: 'causality' }, serves: { inverse: 'served_by', cat: 'intent' },
+    located_at: { inverse: 'location_of', cat: 'space' }, contributes_to: { inverse: 'contributed_by', cat: 'work' },
+    relates_to: { inverse: 'relates_to', cat: 'generic' },
+  };
+  const isCanonicalRel = (r) => Object.prototype.hasOwnProperty.call(REL_TYPES, r);
+
+  const LAWS = [
+    { id: 1, text: 'Reality only changes through Events.', enforced: true },
+    { id: 2, text: 'Events are immutable and never disappear.', enforced: true },
+    { id: 3, text: 'History cannot be edited (deletion is tombstoning).', enforced: true },
+    { id: 4, text: 'State is always derived from Events.', enforced: true },
+    { id: 5, text: 'Everything has identity (a RealityID).', enforced: true },
+    { id: 6, text: 'Every Event has provenance (a source).', enforced: true },
+    { id: 7, text: 'Every Prediction carries a confidence in [0,1].', enforced: true },
+    { id: 8, text: 'Everything exists on a timeline (every Event has a timestamp).', enforced: true },
+    { id: 9, text: 'Predictions never modify reality; Simulation creates virtual timelines.', enforced: true },
+  ];
+
+  const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  function mintId(type, hint) { return 'rid:' + normalizeType(type) + ':' + ((hint && slug(hint)) || uid()); }
+  function evidence(claim, opts) { const o = opts || {}; return { claim, events: o.events || [], objects: o.objects || [], sources: o.sources || [] }; }
+
+  function statusPatch(type, ev) {
+    if (/\.blocked$/.test(type)) return { status: 'blocked', blockedAt: ev.at, blockReason: (ev.payload && ev.payload.reason) || null };
+    if (/\.unblocked$/.test(type)) return { status: 'active', blockedAt: null, blockReason: null };
+    if (/\.(completed|done|merged|paid|resolved|closed)$/.test(type)) return { status: 'done', doneAt: ev.at };
+    if (/\.(started|opened|reopened)$/.test(type)) return { status: 'active' };
+    if (/\.(cancelled|canceled)$/.test(type)) return { status: 'cancelled' };
+    if (/\.tombstoned$/.test(type)) return { status: 'redacted', redacted: true };
+    return null;
+  }
+
+  class Principal {
+    constructor(id, opts) { const o = opts || {}; this.id = id; this._can = o.can || {}; this.scopeTypes = o.scopeTypes || '*'; this.scopeIds = o.scopeIds || '*'; }
+    can(action) { return this._can === '*' || this._can[action] === true || this._can['*'] === true; }
+    sees(obj) { if (this.scopeTypes !== '*' && !this.scopeTypes.includes(obj.type)) return false; if (this.scopeIds !== '*' && !this.scopeIds.includes(obj.id)) return false; return true; }
+  }
+  const ROOT = new Principal('root', { can: '*' });
+
+  class Reality {
+    constructor() { this.events = []; this.patterns = []; }
+
+    emit(type, subject, payload = {}, at = now(), source = 'manual') {
+      if (!type || !subject) throw new Error('LAW1/5: event needs a type and a subject (identity)');
+      const ev = Object.freeze({ id: uid('ev_'), type, subject, payload, at, source: source || 'manual' });
+      this.events.push(ev); this.events.sort((a, b) => a.at - b.at); return ev;
+    }
+    object(id, type, props = {}, at = now()) {
+      if (!type) throw new Error('LAW5: object needs a type');
+      if (!id) id = mintId(type, props.name);
+      this.emit('object.created', id, Object.assign({ type: type, ontology: normalizeType(type) }, props), at, 'def');
+      return id;
+    }
+    update(id, patch, at = now()) { return this.emit('object.updated', id, { patch }, at); }
+    relate(from, rtype, to, props = {}, at = now()) {
+      const rid = uid('rel_');
+      this.emit('rel.created', from, Object.assign({ rid, from, rtype, to, canonical: isCanonicalRel(rtype) }, props), at);
+      return rid;
+    }
+    unrelate(rid, at = now()) { return this.emit('rel.ended', rid, { rid }, at); }
+    forget(id, at = now()) { return this.emit('object.tombstoned', id, {}, at, 'redaction'); }
+
+    materialize(t = Infinity) {
+      const objects = new Map(); const rels = [];
+      for (const e of this.events) {
+        if (e.at > t) continue;
+        if (e.type === 'object.created') objects.set(e.subject, Object.assign({ id: e.subject, status: 'active' }, e.payload, { _events: [] }));
+        else if (e.type === 'object.updated') { const o = objects.get(e.subject); if (o) Object.assign(o, e.payload.patch || {}); }
+        else if (e.type === 'rel.created') rels.push({ id: e.payload.rid, from: e.payload.from, rtype: e.payload.rtype, to: e.payload.to, props: e.payload, active: true, since: e.at });
+        else if (e.type === 'rel.ended') { const r = rels.find(r => r.id === e.payload.rid); if (r) { r.active = false; r.until = e.at; } }
+        else { const o = objects.get(e.subject); if (o) { const p = statusPatch(e.type, e); if (p) Object.assign(o, p); } }
+        const o = objects.get(e.subject); if (o) o._events.push(e);
+      }
+      return { objects, rels: rels.filter(r => r.active), t };
+    }
+    view(principal = ROOT, t = Infinity) {
+      if (!principal.can('see')) return { objects: new Map(), rels: [], t };
+      const snap = this.materialize(t);
+      const objects = new Map([...snap.objects].filter(([, o]) => principal.sees(o)));
+      const rels = snap.rels.filter(r => objects.has(r.from) && objects.has(r.to));
+      return { objects, rels, t };
+    }
+
+    neighbors(snap, id, rtype = null, dir = 'out') {
+      return snap.rels.filter(r => (dir === 'out' ? r.from === id : r.to === id) && (!rtype || r.rtype === rtype))
+        .map(r => ({ rel: r, node: snap.objects.get(dir === 'out' ? r.to : r.from) })).filter(x => x.node);
+    }
+    byType(snap, type) { return [...snap.objects.values()].filter(o => o.type === type); }
+    byKind(snap, ancestor) { return [...snap.objects.values()].filter(o => isA(o.type, ancestor)); }
+
+    context(id, t = Infinity) {
+      const snap = this.materialize(t); const o = snap.objects.get(id); if (!o) return null;
+      const why = [], related = [], evEvents = [];
+      if (o.status === 'blocked') {
+        if (o.blockReason) why.push('Blocked: ' + o.blockReason + '.');
+        o._events.filter(e => /\.blocked$/.test(e.type)).forEach(e => evEvents.push(e.id));
+        this.neighbors(snap, id, 'depends_on', 'out').filter(n => n.node.status !== 'done').forEach(b => why.push('Waiting on ' + (b.node.name || b.node.id) + ' (' + b.node.status + ').'));
+      }
+      const dependents = this.neighbors(snap, id, 'depends_on', 'in');
+      if (dependents.length) why.push(dependents.length + ' item(s) depend on this finishing.');
+      const goal = this.intentOf(id, snap);
+      if (goal && goal.deadline) why.push('Serves "' + goal.name + '" — ' + daysBetween(t === Infinity ? now() : t, goal.deadline) + ' day(s) to deadline.');
+      this.neighbors(snap, id, 'owns', 'in').forEach(ow => related.push(ow.node));
+      return {
+        object: o, why, related, history: o._events, confidence: 0.86,
+        contextObject: {
+          time: t === Infinity ? now() : t, status: o.status, goal: goal ? goal.id : null,
+          dependencies: this.neighbors(snap, id, 'depends_on', 'out').map(n => n.node.id),
+          dependents: dependents.map(n => n.node.id), owners: related.map(r => r.id),
+          evidence: evidence((o.name || id) + ' is ' + o.status, { events: evEvents, objects: [id] }),
+        },
+      };
+    }
+
+    understand(t = Infinity) {
+      const snap = this.materialize(t); const risks = [], bottlenecks = [], cycles = this._cycles(snap);
+      for (const goal of this.byType(snap, 'goal')) {
+        if (goal.status === 'done') continue;
+        const tasks = this._tasksForGoal(snap, goal.id); const blocked = tasks.filter(x => x.status === 'blocked'); const pred = this._predict(snap, goal, tasks);
+        if (pred.probability < 0.6 || blocked.length) {
+          risks.push({
+            subject: goal.id, title: '"' + goal.name + '" is at risk', probability: 1 - pred.probability, confidence: 0.8,
+            why: blocked.length ? blocked.map(b => b.name).join(', ') + ' blocked on the path; ' + pred.drivers.join('; ') + '.' : pred.drivers.join('; ') + '.',
+            evidence: evidence('"' + goal.name + '" may miss its deadline', { events: blocked.flatMap(b => b._events.filter(e => /\.blocked$/.test(e.type)).map(e => e.id)), objects: [goal.id].concat(blocked.map(b => b.id)) }),
+          });
+        }
+      }
+      const degree = new Map(); snap.rels.forEach(r => degree.set(r.to, (degree.get(r.to) || 0) + 1));
+      [...degree.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).forEach(([id, deg]) => { const o = snap.objects.get(id); if (o && deg >= 2 && o.status !== 'done') bottlenecks.push({ id, name: o.name || id, degree: deg, type: o.type, confidence: clamp(deg / 6, 0.4, 0.95) }); });
+      risks.sort((a, b) => b.probability - a.probability);
+      return { risks, bottlenecks, cycles, snapshot: { objects: snap.objects.size, rels: snap.rels.length } };
+    }
+    _tasksForGoal(snap, goalId) {
+      const isWork = o => o.type === 'task' || o.type === 'code';
+      const projs = this.neighbors(snap, goalId, 'advances', 'in').map(n => n.node).filter(o => o.type === 'project');
+      let tasks = []; projs.forEach(p => { tasks = tasks.concat(this.neighbors(snap, p.id, 'belongs_to', 'in').map(n => n.node).filter(isWork)); });
+      tasks = tasks.concat(this.neighbors(snap, goalId, 'advances', 'in').map(n => n.node).filter(isWork));
+      return [...new Map(tasks.map(x => [x.id, x])).values()];
+    }
+    _cycles(snap) {
+      const adj = {}; snap.rels.filter(r => r.rtype === 'depends_on').forEach(r => (adj[r.from] = adj[r.from] || []).push(r.to));
+      const seen = new Set(), stack = new Set(), found = [];
+      const dfs = (n, path) => { seen.add(n); stack.add(n); for (const m of adj[n] || []) { if (stack.has(m)) found.push([...path, n, m].map(id => (snap.objects.get(id) || {}).name || id)); else if (!seen.has(m)) dfs(m, [...path, n]); } stack.delete(n); };
+      Object.keys(adj).forEach(n => { if (!seen.has(n)) dfs(n, []); });
+      return found;
+    }
+
+    predict(goalId, t = Infinity) { const snap = this.materialize(t); const goal = snap.objects.get(goalId); if (!goal) return null; return this._predict(snap, goal, this._tasksForGoal(snap, goalId), t); }
+    _predict(snap, goal, tasks, t = Infinity) {
+      const ref = t === Infinity ? now() : t;
+      const total = tasks.length || 1, done = tasks.filter(x => x.status === 'done').length, remaining = total - done;
+      const blockedCritical = tasks.filter(x => x.status === 'blocked' && this.neighbors(snap, x.id, 'depends_on', 'in').length > 0).length;
+      const daysLeft = goal.deadline ? Math.max(0, daysBetween(ref, goal.deadline)) : 30;
+      const doneEvents = tasks.flatMap(x => x._events.filter(e => /\.(completed|done|merged)$/.test(e.type)));
+      let velocity = 0.4; if (doneEvents.length >= 2) { const span = Math.max(1, daysBetween(Math.min(...doneEvents.map(e => e.at)), Math.max(...doneEvents.map(e => e.at)))); velocity = doneEvents.length / span; }
+      const feasible = velocity * daysLeft; let p = clamp(feasible / remaining, 0, 1.1); p -= blockedCritical * 0.42; if (daysLeft === 0 && remaining > 0) p = 0.05;
+      const probability = clamp(p, 0.03, 0.97); const slipDays = Math.ceil(remaining / Math.max(0.2, velocity)) + blockedCritical * 3;
+      const drivers = [remaining + '/' + total + ' tasks remaining', daysLeft + ' day(s) to deadline'];
+      if (blockedCritical) drivers.push(blockedCritical + ' blocked task(s) on the critical path');
+      drivers.push('team velocity ~' + velocity.toFixed(2) + ' tasks/day');
+      return { goal: goal.id, probability, confidence: 0.78, drivers, projectedDate: ref + slipDays * DAY, remaining, total, blockedCritical, daysLeft, velocity, evidence: evidence('on-time probability ' + Math.round(probability * 100) + '%', { objects: [goal.id].concat(tasks.map(t => t.id)) }) };
+    }
+
+    simulate(hypos, focusGoalId = null) {
+      const before = this._worldState(focusGoalId);
+      const ghost = new Reality(); ghost.events = this.events.map(e => ({ ...e })); ghost.patterns = this.patterns;
+      hypos.forEach(h => ghost.emit(h.type, h.subject, h.payload || {}, h.at || now(), 'simulation'));
+      const after = ghost._worldState(focusGoalId); const deltas = [];
+      after.predictions.forEach(ap => { const bp = before.predictions.find(x => x.goal === ap.goal); if (bp) deltas.push({ goal: ap.goal, name: ap.name, before: Math.round(bp.probability * 100), after: Math.round(ap.probability * 100), delta: Math.round((ap.probability - bp.probability) * 100), dateShift: daysBetween(bp.projectedDate, ap.projectedDate) }); });
+      return { before, after, deltas, applied: hypos };
+    }
+    _worldState(focusGoalId) {
+      const snap = this.materialize(); const goals = focusGoalId ? [snap.objects.get(focusGoalId)].filter(Boolean) : this.byType(snap, 'goal');
+      const predictions = goals.filter(g => g.status !== 'done').map(g => { const p = this._predict(snap, g, this._tasksForGoal(snap, g.id)); p.name = g.name; return p; });
+      return { predictions, objectCount: snap.objects.size };
+    }
+
+    decide(t = Infinity) {
+      const { risks } = this.understand(t); const snap = this.materialize(t); const actions = [];
+      for (const risk of risks) {
+        const goal = snap.objects.get(risk.subject); const tasks = this._tasksForGoal(snap, risk.subject); const blocked = tasks.filter(x => x.status === 'blocked');
+        for (const b of blocked) {
+          const sim = this.simulate([{ type: 'task.unblocked', subject: b.id }, { type: 'task.completed', subject: b.id }], risk.subject);
+          const dd = sim.deltas.find(x => x.goal === risk.subject); const owner = this.neighbors(snap, b.id, 'owns', 'in')[0] ? this.neighbors(snap, b.id, 'owns', 'in')[0].node : null;
+          actions.push({ action: 'Unblock "' + b.name + '"' + (owner ? ' (owner ' + owner.name + ')' : ''), reason: b.blockReason ? "It's blocked: " + b.blockReason + '. ' + risk.why : risk.why, evidence: risk.evidence, confidence: 0.8, expectedResult: dd ? 'On-time odds for "' + goal.name + '" ' + dd.before + '% → ' + dd.after + '% (' + (dd.delta >= 0 ? '+' : '') + dd.delta + ' pts)' + (dd.dateShift ? ', date moves ' + (-dd.dateShift) + ' day(s) earlier' : '') + '.' : 'Removes a critical blocker.', impact: Math.round(risk.probability * 100), _score: (dd ? Math.max(0, dd.delta) : 10) * risk.probability });
+        }
+        if (!blocked.length) actions.push({ action: 'Accelerate "' + goal.name + '"', reason: risk.why, evidence: risk.evidence, confidence: 0.6, expectedResult: 'Add capacity or de-scope to raise on-time odds.', impact: Math.round(risk.probability * 100), _score: risk.probability * 5 });
+      }
+      actions.sort((a, b) => b._score - a._score); return actions;
+    }
+
+    effects(id, snap) {
+      snap = snap || this.materialize(); const out = new Set(), order = [];
+      const walk = (n) => { for (const x of this.neighbors(snap, n, 'depends_on', 'in')) { if (!out.has(x.node.id)) { out.add(x.node.id); order.push(x.node); walk(x.node.id); } } for (const x of this.neighbors(snap, n, 'causes', 'out')) { if (!out.has(x.node.id)) { out.add(x.node.id); order.push(x.node); walk(x.node.id); } } };
+      walk(id); return order;
+    }
+    causalChain(goalId, t = Infinity) {
+      const snap = this.materialize(t); const goal = snap.objects.get(goalId); if (!goal) return null;
+      const tasks = this._tasksForGoal(snap, goalId); const chains = [];
+      for (const b of tasks.filter(x => x.status === 'blocked')) {
+        const chain = []; if (b.blockReason) chain.push({ kind: 'root_cause', label: b.blockReason });
+        chain.push({ kind: 'blocked', id: b.id, label: b.name });
+        this.effects(b.id, snap).filter(o => tasks.some(t => t.id === o.id)).forEach(o => chain.push({ kind: 'effect', id: o.id, label: o.name }));
+        chain.push({ kind: 'at_risk', id: goal.id, label: goal.name }); chains.push({ chain, confidence: 0.74 });
+      }
+      return { goal: goalId, chains, confidence: 0.74, evidence: evidence('causal chain to goal risk', { objects: [goalId] }) };
+    }
+
+    intentOf(id, snap) {
+      snap = snap || this.materialize(); let cur = id, guard = 0;
+      while (guard++ < 20) { const o = snap.objects.get(cur); if (!o) return null; if (o.type === 'goal') return o; const up = this.neighbors(snap, cur, 'advances', 'out')[0] || this.neighbors(snap, cur, 'belongs_to', 'out')[0] || this.neighbors(snap, cur, 'part_of', 'out')[0] || this.neighbors(snap, cur, 'serves', 'out')[0]; if (!up) return null; cur = up.node.id; }
+      return null;
+    }
+    goalGraph(t = Infinity) {
+      const snap = this.materialize(t);
+      return this.byType(snap, 'goal').map(g => ({ id: g.id, name: g.name, status: g.status, deadline: g.deadline || null, businessValue: g.businessValue || 0, parents: this.neighbors(snap, g.id, 'advances', 'out').concat(this.neighbors(snap, g.id, 'part_of', 'out')).map(n => n.node.id).filter(pid => (snap.objects.get(pid) || {}).type === 'goal'), feeders: this.neighbors(snap, g.id, 'advances', 'in').map(n => n.node.id) }));
+    }
+
+    memory(t = Infinity) {
+      const snap = this.materialize(t); const u = this.understand(t);
+      const ref = t === Infinity ? now() : t; const recent = [...this.events].filter(e => e.at <= ref).sort((a, b) => b.at - a.at);
+      const typeCounts = {}; [...snap.objects.values()].forEach(o => typeCounts[o.type] = (typeCounts[o.type] || 0) + 1);
+      return { working: u.risks.map(r => r.title), short: recent.slice(0, 20).map(e => ({ type: e.type, subject: e.subject, at: e.at })), long: this.patterns, organizational: this.patterns, semantic: typeCounts, historical: { events: this.events.length, since: this.events[0] ? this.events[0].at : null } };
+    }
+
+    attention(limit = 8, t = Infinity) {
+      const snap = this.materialize(t); const u = this.understand(t); const riskIds = new Set(u.risks.flatMap(r => r.evidence.objects));
+      const degree = new Map(); snap.rels.forEach(r => degree.set(r.to, (degree.get(r.to) || 0) + 1)); const ref = t === Infinity ? now() : t;
+      return [...snap.objects.values()].filter(o => o.status !== 'done').map(o => {
+        let s = 0; const reasons = [];
+        if (o.status === 'blocked') { s += 5; reasons.push('blocked'); }
+        if (riskIds.has(o.id)) { s += 4; reasons.push('on a risk path'); }
+        const deg = degree.get(o.id) || 0; if (deg >= 2) { s += deg; reasons.push(deg + ' dependencies'); }
+        const last = o._events[o._events.length - 1]; if (last && daysBetween(last.at, ref) <= 2) { s += 1.5; reasons.push('recent activity'); }
+        if (o.value || o.businessValue) { s += 2; reasons.push('business value'); }
+        return { id: o.id, name: o.name || o.id, type: o.type, score: +s.toFixed(1), reasons };
+      }).filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, limit);
+    }
+
+    economics(t = Infinity) {
+      const snap = this.materialize(t); const u = this.understand(t); let exposure = 0; const lines = [];
+      for (const risk of u.risks) {
+        const goal = snap.objects.get(risk.subject); if (!goal) continue;
+        const customers = this.neighbors(snap, risk.subject, 'committed_to', 'in').map(n => n.node);
+        const custVal = customers.reduce((a, c) => a + (+c.value || 0), 0); const gVal = +goal.businessValue || 0;
+        const atRisk = Math.round((custVal + gVal) * risk.probability); exposure += atRisk;
+        lines.push({ goal: goal.name, valueAtRisk: atRisk, probability: +risk.probability.toFixed(2), customers: customers.map(c => c.name) });
+      }
+      return { exposure, lines, confidence: 0.7 };
+    }
+
+    remember(signature, situation, resolution) { this.patterns.push({ signature, situation, resolution, at: now() }); }
+    recall(signature) { return this.patterns.filter(p => p.signature === signature); }
+
+    coordinate(goalId, t = Infinity) {
+      const snap = this.materialize(t); const goal = snap.objects.get(goalId); if (!goal) return [];
+      return this._tasksForGoal(snap, goalId).filter(x => x.status !== 'done').map(x => { const own = this.neighbors(snap, x.id, 'owns', 'in')[0]; const owner = own ? own.node : null; const blocked = x.status === 'blocked'; return { who: owner ? owner.name : 'unassigned', what: x.name, state: x.status, when: blocked ? 'unblock first' : 'in sequence', priority: blocked ? 'now' : 'next' }; });
+    }
+
+    toJSON() { return { events: this.events, patterns: this.patterns }; }
+    static fromJSON(d) { const r = new Reality(); if (d) { r.events = (d.events || []).map(e => Object.freeze({ ...e })); r.patterns = d.patterns || []; } return r; }
+  }
+
+  function seed() {
+    const r = new Reality(); const d = (n) => now() - n * DAY;
+    ['Sara Khan', 'Omar Riaz', 'Maya Lopez', 'Dev Patel', 'Priya Nair'].forEach((n, i) => r.object('person:' + n.split(' ')[0].toLowerCase(), 'person', { name: n, role: ['Lead', 'Backend', 'Frontend', 'QA', 'PM'][i] }, d(30)));
+    r.object('goal:q3', 'goal', { name: 'Grow Q3 revenue', businessValue: 250000 }, d(40));
+    r.object('goal:checkout', 'goal', { name: 'Ship Checkout v2', deadline: now() + 9 * DAY, businessValue: 80000 }, d(20));
+    r.relate('goal:checkout', 'advances', 'goal:q3', {}, d(20));
+    r.object('cust:acme', 'customer', { name: 'Acme Corp', value: 60000 }, d(20));
+    r.object('proj:checkout', 'project', { name: 'Checkout v2' }, d(20));
+    r.object('task:pay', 'task', { name: 'Payment integration' }, d(14));
+    r.object('task:ui', 'task', { name: 'Checkout UI' }, d(14));
+    r.object('task:qa', 'task', { name: 'QA pass' }, d(14));
+    r.object('task:sec', 'task', { name: 'Security review' }, d(14));
+    r.object('vendor:stripe', 'service', { name: 'Vendor API' }, d(20));
+    r.relate('proj:checkout', 'advances', 'goal:checkout', {}, d(20));
+    ['pay', 'ui', 'qa', 'sec'].forEach(t => r.relate('task:' + t, 'belongs_to', 'proj:checkout', {}, d(14)));
+    r.relate('task:qa', 'depends_on', 'task:pay', {}, d(14));
+    r.relate('task:qa', 'depends_on', 'task:ui', {}, d(14));
+    r.relate('task:sec', 'depends_on', 'task:qa', {}, d(14));
+    r.relate('person:omar', 'owns', 'task:pay', {}, d(14));
+    r.relate('person:maya', 'owns', 'task:ui', {}, d(14));
+    r.relate('person:dev', 'owns', 'task:qa', {}, d(14));
+    r.relate('person:sara', 'owns', 'task:sec', {}, d(14));
+    r.relate('cust:acme', 'committed_to', 'goal:checkout', {}, d(20));
+    r.relate('vendor:stripe', 'causes', 'task:pay', {}, d(2));
+    r.emit('task.started', 'task:ui', {}, d(6));
+    r.emit('task.blocked', 'task:pay', { reason: 'waiting on vendor API keys' }, d(2));
+    r.remember('task.blocked:vendor', 'payment task blocked by vendor delay', 'escalated to vendor + added card guarantee; resolved in 2 days');
+    return r;
+  }
+
+  const API = { Reality, seed, ONTOLOGY, REL_TYPES, LAWS, Principal, evidence, isA, ancestors, mintId, normalizeType };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  if (root) root.RealityEngine = API;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+/* =====================================================================
+   RealityOS — Reality Type System (reality-types.js)
+   An ontology classifies; a TYPE SYSTEM defines behavior:
+   properties · lifecycle (state machine) · capabilities · constraints.
+   Pure; browser + Node. Works alongside reality-engine.js.
+   ===================================================================== */
+(function (root) {
+  /* Each type declares behavior. `extends` aligns with the ontology. */
+  const TYPE_SYSTEM = {
+    entity: { extends: null, properties: ['id', 'name'], capabilities: ['exist'], lifecycle: null, constraints: [] },
+
+    person: { extends: 'human', properties: ['name', 'role'],
+      capabilities: ['decide', 'approve', 'communicate', 'learn', 'own'],
+      lifecycle: null, constraints: ['no_self_approval'] },
+
+    ai_agent: { extends: 'entity', properties: ['name', 'model'],
+      capabilities: ['predict', 'recommend', 'simulate', 'observe', 'learn'],
+      lifecycle: { initial: 'created', states: { created: ['configured'], configured: ['learning', 'running'], learning: ['running'], running: ['paused', 'stopped'], paused: ['running', 'stopped'], stopped: [] }, terminal: ['stopped'] },
+      constraints: [] },
+
+    robot: { extends: 'machine', properties: ['name'], capabilities: ['observe', 'move', 'report', 'act'],
+      lifecycle: { initial: 'idle', states: { idle: ['running'], running: ['idle', 'fault'], fault: ['idle'] }, terminal: [] }, constraints: [] },
+
+    sensor: { extends: 'machine', properties: ['name'], capabilities: ['observe', 'report'],
+      lifecycle: { initial: 'online', states: { online: ['offline'], offline: ['online'] }, terminal: [] }, constraints: [] },
+
+    task: { extends: 'process', properties: ['name'],
+      capabilities: ['be_assigned', 'be_blocked', 'be_completed'],
+      lifecycle: { initial: 'created', states: { created: ['assigned', 'active'], assigned: ['active'], active: ['blocked', 'done'], blocked: ['active', 'done'], done: ['archived'], archived: [] }, terminal: ['archived'] },
+      constraints: ['finish_after_start', 'child_needs_parent', 'blocked_needs_reason'] },
+
+    project: { extends: 'process', properties: ['name'],
+      capabilities: ['contain_tasks', 'advance_goal'],
+      lifecycle: { initial: 'planned', states: { planned: ['active'], active: ['blocked', 'done'], blocked: ['active', 'done'], done: ['archived'], archived: [] }, terminal: ['archived'] }, constraints: [] },
+
+    goal: { extends: 'intent', properties: ['name', 'deadline', 'businessValue'],
+      capabilities: ['be_advanced', 'be_predicted'],
+      lifecycle: { initial: 'defined', states: { defined: ['active'], active: ['at_risk', 'achieved', 'missed'], at_risk: ['active', 'achieved', 'missed'], achieved: [], missed: [] }, terminal: ['achieved', 'missed'] }, constraints: [] },
+
+    meeting: { extends: 'process', properties: ['name', 'time'], capabilities: ['be_scheduled'],
+      lifecycle: { initial: 'scheduled', states: { scheduled: ['running', 'cancelled'], running: ['ended'], ended: ['archived'], cancelled: [], archived: [] }, terminal: ['archived', 'cancelled'] }, constraints: [] },
+
+    invoice: { extends: 'document', properties: ['amount', 'dueAt'], capabilities: ['be_paid'],
+      lifecycle: { initial: 'draft', states: { draft: ['issued'], issued: ['paid', 'overdue'], overdue: ['paid'], paid: ['archived'], archived: [] }, terminal: ['archived'] }, constraints: [] },
+
+    payment: { extends: 'document', properties: ['amount'], capabilities: ['settle_invoice'],
+      lifecycle: { initial: 'initiated', states: { initiated: ['authorized', 'failed'], authorized: ['captured', 'failed'], captured: [], failed: [] }, terminal: ['captured', 'failed'] },
+      constraints: ['payment_needs_invoice'] },
+
+    customer: { extends: 'organization', properties: ['name', 'value'], capabilities: ['commit', 'communicate'], lifecycle: null, constraints: [] },
+    code: { extends: 'document', properties: ['name'], capabilities: ['be_reviewed', 'be_merged'], lifecycle: { initial: 'open', states: { open: ['blocked', 'merged', 'closed'], blocked: ['open', 'closed'], merged: [], closed: [] }, terminal: ['merged', 'closed'] }, constraints: [] },
+    service: { extends: 'entity', properties: ['name'], capabilities: ['provide'], lifecycle: null, constraints: [] },
+  };
+
+  function typeDef(type) { return TYPE_SYSTEM[type] || TYPE_SYSTEM.entity; }
+  function lifecycleOf(type) { return typeDef(type).lifecycle; }
+  function capabilities(type) {
+    const out = new Set(); let t = type;
+    while (t) { const d = TYPE_SYSTEM[t]; if (!d) break; (d.capabilities || []).forEach(c => out.add(c)); t = d.extends; }
+    return [...out];
+  }
+  function can(type, capability) { return capabilities(type).includes(capability); }
+  function validTransition(type, from, to) { const lc = lifecycleOf(type); if (!lc) return true; if (!from) return to === lc.initial; const allowed = lc.states[from] || []; return allowed.includes(to); }
+  function isTerminal(type, state) { const lc = lifecycleOf(type); return !!lc && (lc.terminal || []).includes(state); }
+
+  /* map engine `status` to a lifecycle state (engine uses active/blocked/done/...) */
+  function statusToLifecycle(type, status) {
+    const lc = lifecycleOf(type); if (!lc) return status;
+    const map = { active: lc.states.active ? 'active' : lc.initial, blocked: 'blocked', done: lc.states.done ? 'done' : (lc.terminal[0] || 'done'), cancelled: 'cancelled', redacted: 'archived' };
+    return map[status] || status;
+  }
+
+  /* ---- CONSTRAINTS: rules that define VALID reality ---- */
+  const CONSTRAINTS = {
+    finish_after_start(snap, R) {
+      const v = [];
+      for (const o of snap.objects.values()) {
+        if (o.type !== 'task') continue;
+        const started = o._events.find(e => /\.(started|opened)$/.test(e.type));
+        const done = o._events.find(e => /\.(completed|done|merged)$/.test(e.type));
+        if (started && done && done.at < started.at) v.push({ constraint: 'finish_after_start', subject: o.id, message: `${o.name || o.id} completed before it started`, severity: 'error' });
+      }
+      return v;
+    },
+    child_needs_parent(snap, R) {
+      const v = [];
+      for (const o of snap.objects.values()) {
+        if (o.type !== 'task') continue;
+        const hasParent = snap.rels.some(r => r.from === o.id && r.rtype === 'belongs_to');
+        if (!hasParent) v.push({ constraint: 'child_needs_parent', subject: o.id, message: `${o.name || o.id} has no parent project`, severity: 'warn' });
+      }
+      return v;
+    },
+    blocked_needs_reason(snap, R) {
+      const v = [];
+      for (const o of snap.objects.values()) if (o.status === 'blocked' && !o.blockReason) v.push({ constraint: 'blocked_needs_reason', subject: o.id, message: `${o.name || o.id} is blocked with no reason`, severity: 'warn' });
+      return v;
+    },
+    payment_needs_invoice(snap, R) {
+      const v = [];
+      for (const o of snap.objects.values()) {
+        if (o.type !== 'payment') continue;
+        const hasInvoice = snap.rels.some(r => r.from === o.id && r.rtype === 'settles') || snap.rels.some(r => r.to === o.id && r.rtype === 'paid_by');
+        if (!hasInvoice) v.push({ constraint: 'payment_needs_invoice', subject: o.id, message: `${o.name || o.id} exists without an invoice`, severity: 'error' });
+      }
+      return v;
+    },
+    no_self_approval(snap, R) {
+      const v = [];
+      for (const e of (R ? R.events : [])) {
+        if (!/\.approved$/.test(e.type)) continue;
+        const approver = e.payload && e.payload.by; const owner = snap.rels.find(r => r.to === e.subject && r.rtype === 'owns');
+        if (approver && owner && owner.from === approver) v.push({ constraint: 'no_self_approval', subject: e.subject, message: `${approver} approved their own item`, severity: 'error' });
+      }
+      return v;
+    },
+    no_dependency_cycle(snap, R) { return (R && R._cycles ? R._cycles(snap) : []).map(c => ({ constraint: 'no_dependency_cycle', subject: c.join(' → '), message: `circular dependency: ${c.join(' → ')}`, severity: 'error' })); },
+  };
+
+  function checkConstraints(R, t) {
+    const snap = R.materialize(t); const violations = [];
+    for (const name of Object.keys(CONSTRAINTS)) { try { violations.push(...CONSTRAINTS[name](snap, R)); } catch (e) { /* skip */ } }
+    return violations;
+  }
+
+  const API = { TYPE_SYSTEM, CONSTRAINTS, typeDef, lifecycleOf, capabilities, can, validTransition, isTerminal, statusToLifecycle, checkConstraints };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  if (root) root.RealityTypes = API;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+/* =====================================================================
+   RealityOS — Reality Inference Engine (reality-inference.js)
+   Forward-chaining: derives facts NOBODY recorded, with evidence +
+   confidence, iterating to a fixpoint. Inferred facts can themselves
+   trigger further inference (multi-hop).
+   Pure; browser + Node. Operates on a Reality instance.
+   ===================================================================== */
+(function (root) {
+  /* A fact = { type, subject, label, confidence, because:{events,objects,facts}, inferred:true } */
+  const fact = (type, subject, label, confidence, because) => ({ type, subject, label, confidence, because: because || {}, inferred: true });
+
+  /* Rules read the snapshot + facts derived so far, and assert new facts.
+     Each returns an array of new facts (engine de-dupes by type+subject).   */
+  const RULES = [
+    // blocked critical task -> goal at risk
+    function goalAtRisk(R, snap, facts) {
+      const out = [];
+      for (const g of R.byType(snap, 'goal')) {
+        if (g.status === 'done') continue;
+        const tasks = R._tasksForGoal(snap, g.id); const blocked = tasks.filter(x => x.status === 'blocked' && R.neighbors(snap, x.id, 'depends_on', 'in').length);
+        if (blocked.length) out.push(fact('goal_at_risk', g.id, `"${g.name}" at risk (critical task blocked)`, 0.8, { objects: [g.id, ...blocked.map(b => b.id)] }));
+      }
+      return out;
+    },
+    // customer committed to an at-risk goal -> revenue at risk
+    function revenueAtRisk(R, snap, facts) {
+      const out = [];
+      for (const f of facts.filter(f => f.type === 'goal_at_risk')) {
+        for (const c of R.neighbors(snap, f.subject, 'committed_to', 'in').map(n => n.node)) {
+          out.push(fact('revenue_at_risk', c.id, `Revenue at risk: ${c.name} ($${(+c.value || 0).toLocaleString()}) is committed to an at-risk goal`, 0.72, { objects: [c.id, f.subject], facts: [f.type + ':' + f.subject] }));
+        }
+      }
+      return out;
+    },
+    // overdue invoice -> cash-flow risk  (multi-hop chain start)
+    function cashFlowRisk(R, snap, facts) {
+      const out = [];
+      for (const inv of R.byType(snap, 'invoice')) {
+        const overdue = inv.status === 'overdue' || (inv.dueAt && inv.dueAt < snap.t && inv.status !== 'paid');
+        if (overdue) out.push(fact('cash_flow_risk', 'org', `Cash-flow risk: invoice ${inv.name || inv.id} ($${(+inv.amount || 0).toLocaleString()}) overdue`, 0.7, { objects: [inv.id] }));
+      }
+      return out;
+    },
+    // cash-flow risk -> hiring delay risk
+    function hiringDelayRisk(R, snap, facts) {
+      return facts.some(f => f.type === 'cash_flow_risk')
+        ? [fact('hiring_delay_risk', 'org', 'Hiring likely to slow (cash-flow constrained)', 0.55, { facts: ['cash_flow_risk:org'] })] : [];
+    },
+    // hiring delay -> engineering capacity reduction -> goals slip
+    function capacityReduction(R, snap, facts) {
+      return facts.some(f => f.type === 'hiring_delay_risk')
+        ? [fact('capacity_reduction_risk', 'engineering', 'Reduced engineering capacity expected (hiring delayed)', 0.5, { facts: ['hiring_delay_risk:org'] })] : [];
+    },
+    // person owning >1 blocked task -> overloaded
+    function overloaded(R, snap, facts) {
+      const out = []; const byOwner = {};
+      snap.rels.filter(r => r.rtype === 'owns').forEach(r => { const t = snap.objects.get(r.to); if (t && t.status === 'blocked') (byOwner[r.from] = byOwner[r.from] || []).push(t); });
+      for (const [pid, tasks] of Object.entries(byOwner)) if (tasks.length >= 2) { const p = snap.objects.get(pid); out.push(fact('overloaded', pid, `${p ? p.name : pid} is overloaded (${tasks.length} blocked tasks)`, 0.6, { objects: [pid, ...tasks.map(t => t.id)] })); }
+      return out;
+    },
+    // vendor causes a blocked task -> supply risk
+    function supplyRisk(R, snap, facts) {
+      const out = [];
+      snap.rels.filter(r => r.rtype === 'causes').forEach(r => { const t = snap.objects.get(r.to); const v = snap.objects.get(r.from); if (t && t.status === 'blocked') out.push(fact('supply_risk', v.id, `Supply risk: ${v.name || v.id} is blocking ${t.name || t.id}`, 0.68, { objects: [v.id, t.id] })); });
+      return out;
+    },
+  ];
+
+  function infer(R, t = Infinity, maxIter = 6) {
+    const snap = R.materialize(t); const facts = []; const key = f => f.type + ':' + f.subject; const seen = new Set();
+    let iter = 0, added = true;
+    while (added && iter < maxIter) {
+      added = false; iter++;
+      for (const rule of RULES) {
+        let produced = []; try { produced = rule(R, snap, facts) || []; } catch (e) { produced = []; }
+        for (const f of produced) if (!seen.has(key(f))) { seen.add(key(f)); facts.push(f); added = true; }
+      }
+    }
+    return { facts, iterations: iter };
+  }
+
+  /* optionally write inferred facts back as events (source 'inference') so they persist + replay */
+  function record(R, t = Infinity) {
+    const { facts } = infer(R, t);
+    facts.forEach(f => R.emit('fact.inferred', f.subject, { factType: f.type, label: f.label, confidence: f.confidence, because: f.because }, Date.now(), 'inference'));
+    return facts;
+  }
+
+  const API = { RULES, infer, record, fact };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  if (root) root.RealityInference = API;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+/* =====================================================================
+   RealityQL — a query language for reality (not SQL, not REST).
+   Verbs: OBSERVE · UNDERSTAND · EXPLAIN/WHY · PREDICT · SIMULATE ·
+          DECIDE · COORDINATE · ATTENTION · ECONOMICS · CAUSE · MEMORY
+   Modifiers: "AS OF <n>" (time-travel n days back), "LIMIT <n>"
+   Pure; runs in browser + Node. Operates on a Reality instance.
+   ===================================================================== */
+(function (root) {
+  const DAY = 86400000;
+  function safeReq(p) { try { return (typeof require !== 'undefined') ? require(p) : null; } catch (e) { return null; } }
+  const T = safeReq('./reality-types.js') || (root && root.RealityTypes);
+  const INF = safeReq('./reality-inference.js') || (root && root.RealityInference);
+
+  /* --- tokenizer: whitespace split, but keep "quoted phrases" together --- */
+  function tokenize(src) {
+    const out = []; const re = /"([^"]*)"|(\S+)/g; let m;
+    while ((m = re.exec(src))) out.push(m[1] !== undefined ? m[1] : m[2]);
+    return out;
+  }
+
+  /* --- parser: VERB arg* [AS OF n] [LIMIT n] --- */
+  function parse(src) {
+    const toks = tokenize(src.trim());
+    if (!toks.length) return { error: 'empty query' };
+    const verb = toks[0].toUpperCase();
+    const opts = {}; const args = [];
+    for (let i = 1; i < toks.length; i++) {
+      const T = toks[i].toUpperCase();
+      if (T === 'AS' && (toks[i + 1] || '').toUpperCase() === 'OF') { opts.asOfDays = parseInt(toks[i + 2], 10) || 0; i += 2; }
+      else if (T === 'LIMIT') { opts.limit = parseInt(toks[i + 1], 10) || 10; i += 1; }
+      else args.push(toks[i]);
+    }
+    return { verb, args, opts };
+  }
+
+  /* resolve an arg to an object id: exact id, or case-insensitive name match */
+  function resolveId(R, snap, arg) {
+    if (!arg) return null;
+    if (snap.objects.has(arg)) return arg;
+    const a = arg.toLowerCase();
+    for (const o of snap.objects.values()) {
+      if ((o.id || '').toLowerCase() === a) return o.id;
+      if (o.name && o.name.toLowerCase().includes(a)) return o.id;
+    }
+    return arg; // leave as-is (may be a partial id)
+  }
+  function firstGoal(R, snap) { const g = R.byType(snap, 'goal').find(x => x.deadline) || R.byType(snap, 'goal')[0]; return g ? g.id : null; }
+
+  /* --- executor --- */
+  function execute(R, src) {
+    const q = parse(src);
+    if (q.error) return { ok: false, text: q.error };
+    const t = q.opts.asOfDays ? Date.now() - q.opts.asOfDays * DAY : Infinity;
+    const snap = R.materialize(t);
+    const lim = q.opts.limit || 10;
+    const A = q.args.map(a => a);
+
+    switch (q.verb) {
+      case 'OBSERVE': {
+        let list = [...snap.objects.values()];
+        const sel = (A[0] || '').toLowerCase();
+        if (sel && sel !== 'all' && sel !== '*') list = list.filter(o => o.type === sel || R.isA?.(o.type, sel) || (o.name || '').toLowerCase().includes(sel));
+        list = list.slice(0, lim);
+        return { ok: true, verb: 'OBSERVE', result: list.map(o => ({ id: o.id, type: o.type, name: o.name, status: o.status })),
+          text: list.length ? list.map(o => `• ${o.name || o.id} [${o.type}] — ${o.status}`).join('\n') : 'nothing matches.' };
+      }
+      case 'UNDERSTAND': {
+        const u = R.understand(t);
+        const txt = [u.risks.length ? 'Risks:\n' + u.risks.map(r => `  • ${Math.round(r.probability * 100)}% ${r.title.replace(/"/g, '')}`).join('\n') : 'No risks.',
+          u.bottlenecks.length ? 'Bottlenecks: ' + u.bottlenecks.map(b => b.name).join(', ') : '',
+          u.cycles.length ? 'Dependency cycles: ' + u.cycles.length : ''].filter(Boolean).join('\n');
+        return { ok: true, verb: 'UNDERSTAND', result: u, text: txt };
+      }
+      case 'EXPLAIN': case 'WHY': {
+        const id = resolveId(R, snap, A[0]); const c = R.context(id, t);
+        if (!c) return { ok: false, text: `unknown object: ${A[0]}` };
+        return { ok: true, verb: 'EXPLAIN', result: c, confidence: c.confidence,
+          text: `${c.object.name || id} is ${c.object.status}.\n` + (c.why.length ? c.why.map(w => '  • ' + w).join('\n') : '  (no notable context)') + `\n[confidence ${Math.round(c.confidence * 100)}%]` };
+      }
+      case 'CAUSE': case 'CAUSALITY': {
+        const id = resolveId(R, snap, A[0]) || firstGoal(R, snap); const cc = R.causalChain(id, t);
+        if (!cc || !cc.chains.length) return { ok: true, verb: 'CAUSE', result: cc, text: 'no causal chain found.' };
+        return { ok: true, verb: 'CAUSE', result: cc, confidence: cc.confidence,
+          text: cc.chains.map(c => c.chain.map(n => n.label).join('  →  ')).join('\n') + `\n[confidence ${Math.round(cc.confidence * 100)}%]` };
+      }
+      case 'PREDICT': {
+        const id = resolveId(R, snap, A[0]) || firstGoal(R, snap); const p = R.predict(id, t);
+        if (!p) return { ok: false, text: `no goal: ${A[0] || ''}` };
+        return { ok: true, verb: 'PREDICT', result: p, confidence: p.confidence,
+          text: `${snap.objects.get(id)?.name || id}: on-time ${Math.round(p.probability * 100)}%\n  drivers: ${p.drivers.join(' | ')}\n[confidence ${Math.round(p.confidence * 100)}%]` };
+      }
+      case 'SIMULATE': {
+        // grammar: SIMULATE <action> <id>   action ∈ unblock|complete|start|block
+        const action = (A[0] || '').toLowerCase(); const id = resolveId(R, snap, A.slice(1).join(' '));
+        const map = { unblock: ['task.unblocked'], complete: ['task.completed'], finish: ['task.unblocked', 'task.completed'], start: ['task.started'], block: ['task.blocked'] };
+        const types = map[action]; if (!types || !snap.objects.has(id)) return { ok: false, text: 'usage: SIMULATE <unblock|finish|complete|start|block> <object>' };
+        const sim = R.simulate(types.map(ty => ({ type: ty, subject: id })));
+        return { ok: true, verb: 'SIMULATE', result: sim,
+          text: sim.deltas.length ? sim.deltas.map(d => `${d.name}: ${d.before}% → ${d.after}% (${d.delta >= 0 ? '+' : ''}${d.delta} pts${d.dateShift ? ', ' + (-d.dateShift) + 'd earlier' : ''})`).join('\n') : 'no goal affected.' };
+      }
+      case 'DECIDE': {
+        const acts = R.decide(t).slice(0, lim);
+        return { ok: true, verb: 'DECIDE', result: acts,
+          text: acts.length ? acts.map((a, i) => `${i + 1}. ${a.action}\n   → ${a.expectedResult}`).join('\n') : 'no decisions needed.' };
+      }
+      case 'COORDINATE': {
+        const id = resolveId(R, snap, A[0]) || firstGoal(R, snap); const c = R.coordinate(id, t);
+        return { ok: true, verb: 'COORDINATE', result: c,
+          text: c.length ? c.map(x => `${x.priority.toUpperCase()}  ${x.who} → ${x.what} (${x.state})`).join('\n') : 'nothing to coordinate.' };
+      }
+      case 'ATTENTION': {
+        const at = R.attention(lim, t);
+        return { ok: true, verb: 'ATTENTION', result: at, text: at.map(a => `[${a.score}] ${a.name} — ${a.reasons.join(', ')}`).join('\n') };
+      }
+      case 'ECONOMICS': case 'EXPOSURE': {
+        const ec = R.economics(t);
+        return { ok: true, verb: 'ECONOMICS', result: ec, confidence: ec.confidence,
+          text: `exposure: $${ec.exposure.toLocaleString()}\n` + ec.lines.map(l => `  ${l.goal}: $${l.valueAtRisk.toLocaleString()} at risk`).join('\n') };
+      }
+      case 'MEMORY': case 'TIMELINE': {
+        const m = R.memory(t);
+        return { ok: true, verb: 'MEMORY', result: m, text: `working: ${m.working.join('; ') || '—'}\nrecent events: ${m.short.length}\norganizational patterns: ${m.organizational.length}\ntypes: ${JSON.stringify(m.semantic)}` };
+      }
+      case 'GOALS': {
+        const g = R.goalGraph(t);
+        return { ok: true, verb: 'GOALS', result: g, text: g.map(x => x.name + (x.parents.length ? ' → ' + x.parents.join(',') : ' (top)')).join('\n') };
+      }
+      case 'VERIFY': {
+        const Tx = T || (root && root.RealityTypes); const violations = Tx ? Tx.checkConstraints(R, t) : [];
+        // light contradiction scan: same subject, differing status from different sources
+        const contradictions = [];
+        for (const o of snap.objects.values()) {
+          const bySource = {}; (o._events || []).forEach(e => { const s = /\.blocked$/.test(e.type) ? 'blocked' : /\.(completed|done|merged|paid)$/.test(e.type) ? 'done' : /\.(started|opened|unblocked)$/.test(e.type) ? 'active' : null; if (s) bySource[e.source] = s; });
+          const vals = new Set(Object.values(bySource)); if (Object.keys(bySource).length >= 2 && vals.size >= 2) contradictions.push({ subject: o.id, claims: bySource });
+        }
+        const ok = violations.filter(v => v.severity === 'error').length === 0 && contradictions.length === 0;
+        const txt = [ok ? '✓ reality is consistent.' : '✗ inconsistencies found:',
+          ...violations.map(v => `  [${v.severity}] ${v.message}`),
+          ...contradictions.map(c => `  [conflict] ${c.subject}: ${Object.entries(c.claims).map(([s, val]) => s + '=' + val).join(' vs ')}`)].join('\n');
+        return { ok: true, verb: 'VERIFY', result: { consistent: ok, violations, contradictions }, text: txt };
+      }
+      case 'INFER': {
+        const Ix = INF || (root && root.RealityInference); if (!Ix) return { ok: false, text: 'inference engine not loaded.' };
+        const { facts } = Ix.infer(R, t);
+        return { ok: true, verb: 'INFER', result: facts, text: facts.length ? facts.map(f => `• ${f.label} (${Math.round(f.confidence * 100)}%)`).join('\n') : 'no facts inferred.' };
+      }
+      case 'REMEMBER': {
+        const what = A.join(' '); if (!what) return { ok: false, text: 'usage: REMEMBER "<pattern note>"' };
+        R.remember('note', what, what); return { ok: true, verb: 'REMEMBER', result: { stored: what }, text: 'remembered: ' + what };
+      }
+      case 'CAPABILITIES': {
+        const Tx = T || (root && root.RealityTypes); const id = resolveId(R, snap, A[0]); const o = snap.objects.get(id);
+        const ty = o ? o.type : (A[0] || '').toLowerCase(); const caps = Tx ? Tx.capabilities(ty) : [];
+        return { ok: true, verb: 'CAPABILITIES', result: caps, text: `${ty} can: ${caps.join(', ') || '(none)'}` };
+      }
+      case 'LIFECYCLE': {
+        const Tx = T || (root && root.RealityTypes); const ty = (A[0] || '').toLowerCase(); const lc = Tx ? Tx.lifecycleOf(ty) : null;
+        return { ok: true, verb: 'LIFECYCLE', result: lc, text: lc ? `${ty}: ${Object.keys(lc.states).join(' → ')}` : `${ty} has no lifecycle.` };
+      }
+      default:
+        return { ok: false, text: `unknown verb "${q.verb}". Try: OBSERVE, UNDERSTAND, EXPLAIN, PREDICT, SIMULATE, DECIDE, COORDINATE, CAUSE, ATTENTION, ECONOMICS, MEMORY, GOALS.` };
+    }
+  }
+
+  const API = { tokenize, parse, execute,
+    VERBS: ['OBSERVE', 'UNDERSTAND', 'EXPLAIN', 'WHY', 'PREDICT', 'SIMULATE', 'DECIDE', 'COORDINATE', 'CAUSE', 'ATTENTION', 'ECONOMICS', 'MEMORY', 'GOALS', 'VERIFY', 'INFER', 'REMEMBER', 'CAPABILITIES', 'LIFECYCLE'] };
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+  if (root) root.RealityQL = API;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+/* =====================================================================
+   RealityOS — App UI (drives the Reality Engine)
+   ===================================================================== */
+const { Reality, seed } = window.RealityEngine;
+const $ = s => document.querySelector(s);
+const DAY = 86400000, MEM = {}, SKEY = 'realityos:workspace';
+
+/* ---- CONFIG: replace these with YOUR Paddle values to go live ---- */
+const CONFIG = {
+  support: 'support@stmzkinetic.com',
+  paddle: {
+    environment: 'sandbox',          // 'sandbox' while testing, 'production' when live
+    clientToken: '',                 // Paddle > Developer tools > Authentication (client-side token)
+    // create these in your Paddle dashboard (Catalog > Products/Prices), then paste the pri_... IDs:
+    pricePro: 'pri_REPLACE_pro_monthly',
+    priceBusiness: 'pri_REPLACE_business_monthly',
+  }
+};
+
+/* ---- persistence: window.storage (Claude) -> localStorage (deployed) -> memory ---- */
+const Store = {
+  async get(k){ if(window.storage){try{const r=await window.storage.get(k);return r?JSON.parse(r.value):null;}catch{return null;}}
+    try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch{return MEM[k]??null;} },
+  async set(k,v){ if(window.storage){try{await window.storage.set(k,JSON.stringify(v));return;}catch{}}
+    try{localStorage.setItem(k,JSON.stringify(v));}catch{MEM[k]=v;} },
+  async del(k){ if(window.storage){try{await window.storage.delete(k);return;}catch{}}
+    try{localStorage.removeItem(k);}catch{delete MEM[k];} }
+};
+
+let R = null, WS = { name:'', apiKey:'' }, TT = 0; // TT = days back for time machine
+const asOf = () => TT === 0 ? Infinity : Date.now() - TT*DAY;
+async function save(){ await Store.set(SKEY, { name:WS.name, apiKey:WS.apiKey, reality:R.toJSON() }); }
+
+/* ---- helpers ---- */
+const uid = p => p + Math.random().toString(36).slice(2,8);
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+function fmtTime(at){ const d=Date.now()-at; const ad=Math.abs(d);
+  if(ad<3600000) return d>=0?Math.max(1,Math.round(ad/60000))+'m ago':'in '+Math.round(ad/60000)+'m';
+  if(ad<DAY) return (d>=0?'':'in ')+Math.round(ad/3600000)+'h'+(d>=0?' ago':'');
+  return (d>=0?'':'in ')+Math.round(ad/DAY)+'d'+(d>=0?' ago':''); }
+const TYPE_COLOR = {person:'var(--teal)',goal:'var(--amber)',project:'var(--violet)',task:'var(--text)',customer:'var(--green)',code:'var(--muted)'};
+const tcolor = o => o.status==='blocked'?'var(--red)':(TYPE_COLOR[o.type]||'var(--faint)');
+
+/* ============================================================ HOME */
+function renderHome(){
+  const t = asOf();
+  $('#homeTitle').textContent = TT===0 ? 'Your reality, right now' : `Reality, ${TT} day(s) ago`;
+  $('#ttLabel').textContent = TT===0 ? 'now' : `${TT}d ago`;
+  $('#ttLabel').className = 'now' + (TT?' past':'');
+  const snap = R.materialize(t);
+  const u = R.understand(t);
+  const evCount = R.events.filter(e=>e.at<=t).length;
+  $('#kpiGrid').innerHTML = [
+    ['Objects', snap.objects.size, ''],
+    ['Events', evCount, ''],
+    ['Relations', snap.rels.length, ''],
+    ['Risks', u.risks.length, u.risks.length?'alert':'']
+  ].map(([l,v,c])=>`<div class="kpi ${c}"><div class="kv">${v}</div><div class="kl">${l}</div></div>`).join('');
+
+  $('#riskList').innerHTML = u.risks.length ? u.risks.map(r=>{
+    const sev = r.probability>=.65?'var(--red)':'var(--amber)';
+    return `<div class="risk" style="--sev:${sev}"><div class="rhead"><div class="rtitle">${r.title}</div>
+      <div class="prob">${Math.round(r.probability*100)}%<small>risk</small></div></div>
+      <div class="meter"><i style="width:${r.probability*100}%"></i></div><p class="why">${r.why}</p></div>`;
+  }).join('') : `<div class="empty">No risks detected at this point in time.</div>`;
+
+  const acts = R.decide(t);
+  $('#decideList').innerHTML = acts.length ? acts.slice(0,3).map(a=>`
+    <div class="act"><div class="at">${a.action}</div><div class="ar">${a.reason}</div>
+      <div class="ax"><span class="lbl">expect</span><span>${a.expectedResult}</span></div>
+      <div class="meta"><span>confidence ${Math.round(a.confidence*100)}%</span><span>impact ${a.impact}</span></div></div>`).join('')
+    : `<div class="empty">Nothing needs a decision right now.</div>`;
+
+  const evs = [...R.events].filter(e=>e.at<=t && e.type!=='object.created' && e.type!=='rel.created').sort((a,b)=>b.at-a.at).slice(0,8);
+  $('#timeline').innerHTML = evs.length ? evs.map(e=>{
+    const o = snap.objects.get(e.subject); const verb = e.type.split('.').pop();
+    const dim = e.at < t-3*DAY;
+    return `<div class="tev ${dim?'dim':''}"><div class="tt">${o?o.name||o.id:e.subject} · ${verb}${e.payload?.reason?` (${e.payload.reason})`:''}</div><div class="td">${new Date(e.at).toLocaleDateString()} · ${fmtTime(e.at)}</div></div>`;
+  }).join('') : `<div class="empty">No events yet.</div>`;
+}
+
+/* ============================================================ OBJECTS */
+let OBJ_TYPE = null;
+function renderObjects(){
+  const snap = R.materialize();
+  const types = [...new Set([...snap.objects.values()].map(o=>o.type))];
+  if(!OBJ_TYPE || !types.includes(OBJ_TYPE)) OBJ_TYPE = types[0];
+  $('#typeSeg').innerHTML = types.length? types.map(ty=>`<button class="${ty===OBJ_TYPE?'on':''}" data-ty="${ty}">${ty}s</button>`).join('') : '';
+  const list = [...snap.objects.values()].filter(o=>o.type===OBJ_TYPE);
+  $('#objList').innerHTML = list.length ? list.map(o=>`
+    <div class="obj" data-obj="${o.id}"><div class="dot" style="background:${tcolor(o)}"></div>
+      <div class="om"><div class="ot">${o.name||o.id}</div><div class="od">${o.id}${o.deadline?` · due ${new Date(o.deadline).toLocaleDateString()}`:''}</div></div>
+      <span class="badge ${o.status}">${o.status}</span></div>`).join('')
+    : `<div class="empty">No ${OBJ_TYPE||'object'}s yet. Tap “+ Object”.</div>`;
+}
+function openContext(id){
+  const snap = R.materialize();
+  const ctx = R.context(id); if(!ctx) return;
+  const o = ctx.object;
+  const outRels = R.neighbors(snap,id,null,'out'), inRels = R.neighbors(snap,id,null,'in');
+  const isTask = o.type==='task';
+  $('#modal').innerHTML = `<div class="grabber"></div>
+    <div class="mt">${o.name||o.id}<button class="x" data-close>✕</button></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px"><span class="badge ${o.status}">${o.status}</span>
+      <span class="badge done" style="background:var(--panel-3);color:var(--muted)">${o.type}</span></div>
+    ${isTask?`<div class="quickacts">
+      <button data-ev="task.blocked" data-s="${id}">Block</button>
+      <button data-ev="task.unblocked" data-s="${id}">Unblock</button>
+      <button data-ev="task.started" data-s="${id}">Start</button>
+      <button data-ev="task.completed" data-s="${id}">Complete</button></div>`:''}
+    <div class="sectlabel" style="margin-top:10px"><span>Context — why</span></div>
+    <ul class="ctxwhy">${ctx.why.length?ctx.why.map(w=>`<li>${w}</li>`).join(''):'<li>No notable context.</li>'}</ul>
+    <div class="sectlabel"><span>Relationships</span></div>
+    <ul class="ctxwhy">${[...outRels.map(x=>`<li>${o.name||id} <b style="color:var(--amber)">${x.rel.rtype}</b> ${x.node.name||x.node.id}</li>`),
+       ...inRels.map(x=>`<li>${x.node.name||x.node.id} <b style="color:var(--amber)">${x.rel.rtype}</b> ${o.name||id}</li>`)].join('')||'<li>No relationships.</li>'}</ul>
+    <div class="sectlabel"><span>History</span></div>
+    <div class="tline">${o._events.slice(-6).reverse().map(e=>`<div class="tev"><div class="tt">${e.type.split('.').pop()}${e.payload?.reason?` (${e.payload.reason})`:''}</div><div class="td">${fmtTime(e.at)}</div></div>`).join('')||'<div class="empty">—</div>'}</div>`;
+  openSheet();
+}
+
+/* ============================================================ REASON */
+function suggestions(){ return ['What\'s at risk?','Why is QA pass stuck?','Will Ship Checkout v2 hit its date?','CAUSE goal:checkout','ATTENTION','ECONOMICS']; }
+function suggestHTML(){ return `<div class="suggest">${suggestions().map(s=>`<button class="qchip" data-q="${s.replace(/"/g,'&quot;')}">${s}</button>`).join('')}</div>`; }
+function initReason(){ $('#messages').innerHTML = `<div class="msg bot"><div class="answer"><p>I reason over your reality graph — <b>context</b> (why), <b>understanding</b> (risks), and <b>prediction</b> (what's coming). Ask in plain English, or type <b>RealityQL</b> like <span style="font-family:var(--mono);color:var(--violet)">PREDICT goal:checkout</span> or <span style="font-family:var(--mono);color:var(--violet)">CAUSE goal:checkout</span>.</p></div>${suggestHTML()}</div>`; }
+function pushMsg(html,who){ const d=document.createElement('div'); d.className='msg '+who; d.innerHTML=html; $('#messages').appendChild(d); window.scrollTo(0,document.body.scrollHeight); }
+function reason(q){
+  const snap = R.materialize(); const t=q.toLowerCase();
+  // object by name
+  const obj = [...snap.objects.values()].find(o=>o.name && t.includes(o.name.toLowerCase().split(' ')[0]) && o.name.length>3);
+  const goals = R.byType(snap,'goal');
+  if(/bottleneck/.test(t)){ const b=R.understand().bottlenecks; return {html:b.length?`Main bottleneck: <b>${b[0].name}</b> — ${b[0].degree} active dependencies route through it. ${b.slice(1).map(x=>x.name).join(', ')} also load-bearing.`:`No bottleneck stands out yet.`,conf:.8}; }
+  if(/risk|wrong|worried|danger/.test(t)){ const u=R.understand(); return {html:u.risks.length?`Top risk: <b>${u.risks[0].title.replace(/"/g,'')}</b> (${Math.round(u.risks[0].probability*100)}%). ${u.risks[0].why}`:`Nothing flagged as risk.`,conf:.82}; }
+  if(/who|coordinate|align|act|assign/.test(t) && goals[0]){ const c=R.coordinate(goals[0].id); return {html:`To align <b>${goals[0].name}</b>:`,list:c.map(x=>`<b>${x.who}</b> → ${x.what} (${x.state}, ${x.priority})`),conf:.78}; }
+  if(obj && obj.type==='goal'){ const p=R.predict(obj.id); return {html:`<b>${obj.name}</b> — on-time probability <b>${Math.round(p.probability*100)}%</b>.`,list:p.drivers,data:`projected finish in ~${Math.round((p.projectedDate-Date.now())/DAY)} days`,conf:.8}; }
+  if(/predict|on time|ship|deadline|hit|late/.test(t) && goals[0]){ const p=R.predict(goals[0].id); return {html:`<b>${goals[0].name}</b> — on-time probability <b>${Math.round(p.probability*100)}%</b>.`,list:p.drivers,data:`projected finish in ~${Math.round((p.projectedDate-Date.now())/DAY)} days`,conf:.8}; }
+  if(obj){ const c=R.context(obj.id); return {html:`<b>${obj.name}</b> is <b>${obj.status}</b>.`,list:c.why,conf:c.confidence}; }
+  // fallback: understanding summary
+  const u=R.understand(); return {html:`Your reality has <b>${snap.objects.size} objects</b>, <b>${snap.rels.length} relationships</b>, and <b>${u.risks.length} active risk(s)</b>. ${u.risks[0]?'Biggest: '+u.risks[0].title.replace(/"/g,'')+'.':''}`,conf:.6}; }
+const QL_VERBS=(window.RealityQL&&window.RealityQL.VERBS)||['OBSERVE','UNDERSTAND','EXPLAIN','WHY','PREDICT','SIMULATE','DECIDE','COORDINATE','CAUSE','ATTENTION','ECONOMICS','MEMORY','GOALS','VERIFY','INFER','REMEMBER','CAPABILITIES','LIFECYCLE'];
+function askReason(q){
+  pushMsg(q,'user');
+  // RealityQL: if the message starts with a QL verb, run the language
+  const v=(q.trim().split(/\s+/)[0]||'').toUpperCase();
+  if(window.RealityQL && QL_VERBS.includes(v)){
+    if(R.isA===undefined) R.isA=window.RealityEngine.isA;
+    const res=window.RealityQL.execute(R,q);
+    const txt=(res.text||'(no result)').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    pushMsg(`<div class="answer"><div style="font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--violet);text-transform:uppercase;margin-bottom:8px">RealityQL · ${v}</div><pre style="white-space:pre-wrap;margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.55;color:var(--text)">${txt}</pre></div>`,'bot');
+    return;
+  }
+  const ty=document.createElement('div'); ty.className='msg bot'; ty.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  $('#messages').appendChild(ty); window.scrollTo(0,document.body.scrollHeight);
+  setTimeout(()=>{ ty.remove(); const a=reason(q);
+    const list=a.list&&a.list.length?`<ul>${a.list.map(x=>`<li>${x}</li>`).join('')}</ul>`:'';
+    const data=a.data?`<div class="dataline">${a.data}</div>`:'';
+    const conf=`<div class="conf"><span class="lbl">confidence</span><div class="bar"><i style="width:${a.conf*100}%"></i></div><span class="pct">${Math.round(a.conf*100)}%</span></div>`;
+    pushMsg(`<div class="answer"><p>${a.html}</p>${list}${data}${conf}</div>`,'bot');
+  },520);
+}
+
+/* ============================================================ SIMULATE */
+function renderSimulate(){
+  const snap = R.materialize();
+  const opts = [];
+  R.byType(snap,'task').forEach(tk=>{
+    if(tk.status==='blocked') opts.push({label:`Unblock & finish "${tk.name}"`, desc:'remove the blocker and complete it', hypos:[{type:'task.unblocked',subject:tk.id},{type:'task.completed',subject:tk.id}]});
+    else if(tk.status!=='done') opts.push({label:`Complete "${tk.name}"`, desc:'mark this task done today', hypos:[{type:'task.completed',subject:tk.id}]});
+  });
+  R.byType(snap,'goal').forEach(g=>{ if(g.deadline) opts.push({label:`Slip "${g.name}" deadline 3 days`, desc:'push the date and see the effect', hypos:[{type:'object.updated',subject:g.id,payload:{patch:{deadline:g.deadline+3*DAY}}}]}); });
+  $('#simOptions').innerHTML = opts.length? opts.map((o,i)=>`<div class="simopt"><div class="sm"><div class="sn">${o.label}</div><div class="sd">${o.desc}</div></div><button class="runbtn" data-sim="${i}">Run</button></div>`).join('') : `<div class="empty">Add some tasks and goals to simulate.</div>`;
+  SIM_OPTS = opts;
+}
+let SIM_OPTS = [];
+function runSim(i){
+  const o = SIM_OPTS[i]; const res = R.simulate(o.hypos, null);
+  const rows = res.deltas.length ? res.deltas.map(d=>`
+    <div class="deltarow"><div class="dn">${d.name}</div>
+      <div class="barpair"><span class="b1">${d.before}%</span><span class="arrow">→</span><span class="b2">${d.after}%</span></div>
+      <span class="deltapill ${d.delta>=0?'up':'down'}">${d.delta>=0?'+':''}${d.delta}</span></div>
+    ${d.dateShift?`<div style="font-family:var(--mono);font-size:11px;color:var(--faint);margin:-4px 0 8px">date moves ${-d.dateShift} day(s) ${d.dateShift<0?'earlier':'later'}</div>`:''}`).join('')
+    : `<div class="empty">No goal affected by this change.</div>`;
+  $('#simResult').innerHTML = `<div class="simresult"><div class="srt">⮕ ${o.label}</div>${rows}
+    <div style="font-size:11.5px;color:var(--faint);margin-top:8px;font-family:var(--mono)">Re-derived from a cloned event log. Your real data is untouched.</div></div>`;
+  window.scrollTo(0,0);
+}
+
+/* ============================================================ MORE: connect / billing / settings */
+const CONNECTORS=[{id:'github',name:'GitHub',icon:'⌥'},{id:'slack',name:'Slack',icon:'#'},{id:'stripe',name:'Stripe',icon:'💳'},{id:'gcal',name:'Calendar',icon:'◷'}];
+const PLANS=[
+  {id:'free',name:'Developer',price:'$0',per:'forever',feat:false,buy:null,
+    items:['1 workspace','Up to 500 objects','Context · Understanding · Prediction','Community support']},
+  {id:'pro',name:'Pro',price:'$29',per:'/ user / mo',feat:true,buy:CONFIG.paddle.pricePro,
+    items:['Unlimited objects & events','Full reasoning + Simulation','Decide engine & Coordination','Event API + integrations','Email support']},
+  {id:'business',name:'Business',price:'$59',per:'/ user / mo',feat:false,buy:CONFIG.paddle.priceBusiness,
+    items:['Everything in Pro','Advanced prediction & learning','SSO + audit log','Time-travel exports','Priority support']},
+  {id:'ent',name:'Enterprise',price:'Custom',per:'',feat:false,buy:'contact',
+    items:['Single-tenant deployment','Customer-managed keys','Security review, SLAs','Dedicated success']},
+];
+function renderMore(){
+  $('#apiKey').textContent = WS.apiKey;
+  $('#snippet').innerHTML = `<span class="t">// pipe any event into your reality</span>\nfetch(<span class="a">"https://api.realityos.app/v1/ingest"</span>, {\n  method: <span class="a">"POST"</span>,\n  headers: { <span class="a">"Authorization"</span>: <span class="a">"Bearer ${WS.apiKey.slice(0,14)}…"</span> },\n  body: JSON.stringify({\n    type: <span class="a">"task.blocked"</span>, subject: <span class="a">"task:pay"</span>,\n    payload: { reason: <span class="a">"vendor delay"</span> }\n  })\n})`;
+  $('#connList').innerHTML = CONNECTORS.map(c=>`<div class="conn"><div class="ic">${c.icon}</div><div><div class="cn">${c.name}</div><div class="cs">maps to Objects/Events</div></div><button class="cbtn" data-conn="${c.id}">Connect</button></div>`).join('');
+  $('#planList').innerHTML = PLANS.map(p=>`<div class="plan ${p.feat?'feat':''}">${p.feat?'<span class="ribbon">Popular</span>':''}
+    <div class="pn">${p.name}</div><div class="pp">${p.price}<small> ${p.per}</small></div>
+    <ul>${p.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    <button class="buy" data-plan="${p.id}" data-price="${p.buy||''}">${p.id==='free'?'Current plan':p.id==='ent'?'Contact sales':'Choose '+p.name}</button></div>`).join('');
+  $('#setName').value = WS.name;
+}
+
+/* ---- Paddle ---- */
+function initPaddle(){
+  if(typeof Paddle==='undefined') return;
+  try{ Paddle.Environment.set(CONFIG.paddle.environment);
+    if(CONFIG.paddle.clientToken) Paddle.Initialize({ token:CONFIG.paddle.clientToken,
+      eventCallback:d=>{ if(d.name==='checkout.completed') toast('Payment complete — welcome aboard'); } });
+  }catch(e){}
+}
+function buy(planId, priceId){
+  if(planId==='free'){ toast("You're on Developer already"); return; }
+  if(planId==='ent'){ window.location.href='mailto:'+CONFIG.support+'?subject=RealityOS Enterprise'; return; }
+  if(!CONFIG.paddle.clientToken || /REPLACE/.test(priceId)){
+    toast('Add your Paddle token + price IDs in CONFIG to take live payments'); return;
+  }
+  try{ Paddle.Checkout.open({ items:[{priceId, quantity:1}], settings:{ successUrl: location.href } }); }
+  catch(e){ toast('Checkout error — check Paddle setup'); }
+}
+
+/* ============================================================ ROUTER / SHELL */
+function go(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.go===view));
+  $('#askbar').classList.toggle('hidden', view!=='reason');
+  window.scrollTo(0,0);
+  if(view==='home') renderHome();
+  if(view==='objects') renderObjects();
+  if(view==='simulate') renderSimulate();
+  if(view==='more') renderMore();
+  if(view==='reason') setTimeout(()=>$('#askInput').focus(),120);
+}
+function openSheet(){ $('#sheet').classList.add('open'); }
+function closeSheet(){ $('#sheet').classList.remove('open'); }
+let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1900); }
+
+function enterApp(){
+  $('#bizName').textContent = WS.name;
+  $('#topbar').classList.remove('hidden'); $('#tabs').classList.remove('hidden');
+  $('#onboard').classList.remove('active');
+  initReason(); initPaddle(); go('home');
+}
+
+/* ---- forms ---- */
+function openAddObject(){
+  const types=['task','goal','project','person','customer','code','document','custom'];
+  $('#modal').innerHTML=`<div class="grabber"></div><div class="mt">New object<button class="x" data-close>✕</button></div>
+    <div class="field"><label>Type</label><select id="f_type">${types.map(t=>`<option>${t}</option>`).join('')}</select></div>
+    <div class="field"><label>Name</label><input id="f_name" placeholder="e.g. Payment integration"></div>
+    <div class="field" id="f_deadwrap" style="display:none"><label>Deadline</label><input id="f_dead" type="date"></div>
+    <div class="btnrow"><button class="btn primary" id="f_save">Add object</button></div>`;
+  openSheet();
+  $('#f_type').onchange=e=>$('#f_deadwrap').style.display = e.target.value==='goal'?'block':'none';
+  $('#f_save').onclick=async()=>{ const ty=$('#f_type').value, nm=$('#f_name').value.trim(); if(!nm){toast('Name required');return;}
+    const id=ty+':'+(slug(nm)||uid('')); const props={name:nm};
+    if(ty==='goal'&&$('#f_dead').value) props.deadline=new Date($('#f_dead').value).getTime();
+    R.object(id,ty,props); await save(); closeSheet(); renderObjects(); toast('Object added'); };
+}
+function openAddRel(){
+  const snap=R.materialize(); const objs=[...snap.objects.values()];
+  const rtypes=['depends_on','blocks','blocked_by','advances','belongs_to','owns','committed_to','implements','relates_to'];
+  const opt=o=>`<option value="${o.id}">${o.name||o.id}</option>`;
+  $('#modal').innerHTML=`<div class="grabber"></div><div class="mt">New relationship<button class="x" data-close>✕</button></div>
+    <div class="field"><label>From</label><select id="r_from">${objs.map(opt).join('')}</select></div>
+    <div class="field"><label>Relationship</label><select id="r_type">${rtypes.map(t=>`<option>${t}</option>`).join('')}</select></div>
+    <div class="field"><label>To</label><select id="r_to">${objs.map(opt).join('')}</select></div>
+    <div class="btnrow"><button class="btn primary" id="r_save">Add relationship</button></div>`;
+  openSheet();
+  $('#r_save').onclick=async()=>{ const f=$('#r_from').value,ty=$('#r_type').value,to=$('#r_to').value;
+    if(f===to){toast('Pick two different objects');return;} R.relate(f,ty,to); await save(); closeSheet(); renderObjects(); renderHome(); toast('Relationship added'); };
+}
+
+/* ============================================================ EVENTS */
+document.addEventListener('click', async e=>{
+  const tab=e.target.closest('.tab'); if(tab){ go(tab.dataset.go); return; }
+  if(e.target.closest('[data-close]')||(e.target.closest('#sheet')&&!e.target.closest('#modal'))){ closeSheet(); return; }
+  const ty=e.target.closest('[data-ty]'); if(ty){ OBJ_TYPE=ty.dataset.ty; renderObjects(); return; }
+  const ob=e.target.closest('[data-obj]'); if(ob){ openContext(ob.dataset.obj); return; }
+  const ev=e.target.closest('[data-ev]'); if(ev){ R.emit(ev.dataset.ev, ev.dataset.s, {}); await save(); closeSheet(); renderObjects(); renderHome(); toast('Event recorded'); return; }
+  const q=e.target.closest('.qchip'); if(q){ askReason(q.dataset.q); return; }
+  const sm=e.target.closest('[data-sim]'); if(sm){ runSim(+sm.dataset.sim); return; }
+  const cn=e.target.closest('[data-conn]'); if(cn){ toast('Live connectors need the backend — pipe events via your API key for now'); return; }
+  const pl=e.target.closest('[data-plan]'); if(pl){ buy(pl.dataset.plan, pl.dataset.price); return; }
+});
+$('#addObj').onclick=openAddObject;
+$('#addRel').onclick=openAddRel;
+$('#startSample').onclick=async()=>{ WS.name=$('#bizInput').value.trim()||'My Workspace'; WS.apiKey='rk_live_'+uid('')+uid(''); R=seed(); await save(); enterApp(); };
+$('#startEmpty').onclick=async()=>{ WS.name=$('#bizInput').value.trim()||'My Workspace'; WS.apiKey='rk_live_'+uid('')+uid(''); R=new Reality(); await save(); enterApp(); };
+$('#sendBtn').onclick=()=>{ const v=$('#askInput').value.trim(); if(v){$('#askInput').value='';askReason(v);} };
+$('#askInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){const v=e.target.value.trim(); if(v){e.target.value='';askReason(v);}} });
+$('#ttSlider').addEventListener('input',e=>{ TT=+e.target.value; renderHome(); });
+$('#copyKey').onclick=()=>{ navigator.clipboard?.writeText(WS.apiKey); toast('API key copied'); };
+$('#simWebhook').onclick=async()=>{ R.emit('task.blocked','task:pay',{reason:'incoming webhook: vendor delay'}); await save(); toast('Event ingested → reality updated'); go('home'); };
+$('#saveName').onclick=async()=>{ WS.name=$('#setName').value.trim()||WS.name; $('#bizName').textContent=WS.name; await save(); toast('Saved'); };
+$('#exportData').onclick=()=>{ const blob=new Blob([JSON.stringify({name:WS.name,reality:R.toJSON()},null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(slug(WS.name)||'realityos')+'.json'; a.click(); toast('Exported'); };
+$('#reseed').onclick=async()=>{ if(confirm('Reload the example reality? This replaces current data.')){ R=seed(); await save(); toast('Example reloaded'); go('home'); } };
+$('#resetAll').onclick=async()=>{ if(confirm('Erase everything and start over?')){ await Store.del(SKEY); location.reload(); } };
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{})); }
+
+/* ============================================================ BOOT */
+(async function boot(){
+  const saved = await Store.get(SKEY);
+  if(saved && saved.reality){ WS.name=saved.name||'My Workspace'; WS.apiKey=saved.apiKey||('rk_live_'+uid('')+uid('')); R=Reality.fromJSON(saved.reality); enterApp(); }
+})();
+
+</script>
+</body>
+</html>

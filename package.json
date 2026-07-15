@@ -1,0 +1,26 @@
+{
+  "name": "realityos",
+  "version": "4.0.1",
+  "description": "RealityOS v4 \u2014 a computational model of reality with a formally specified, machine-verified core. Substrate (objects/events/relationships/time) + reasoning core (graph, probability, optimization, causal, information, decision) + intelligence layer (truth maintenance, understanding, HTN planning, agents, learned physics, explanation) + rigor layer (12 machine-checked axioms, temporal logic, adaptive algorithm selection with justification, incremental & distributed reasoning, PC-stable causal discovery, plugin SDK, domain packages, benchmark vs baselines with calibration). No LLM in the kernel.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node -e \"const{Reality,seed}=require('./reality-engine.js');const r=seed();const s=r.simulate([{type:'task.unblocked',subject:'task:pay'},{type:'task.completed',subject:'task:pay'}],'goal:checkout');console.log('simulation delta:',s.deltas);console.log(r.predict('goal:checkout').probability>0?'ENGINE OK':'FAIL')\"",
+    "demo:reason": "node demo/ci-failure.js",
+    "demo:universal": "node demo/universal.js",
+    "bench": "node bench/benchmark.js",
+    "wedge": "node wedge/measure.js",
+    "demo:intelligence": "node demo/intelligence.js",
+    "verify": "node -e \"const v=require('./reality-verify.js').verify({trials:60});console.log(v.verified?'12/12 axioms verified':'FAILED')\"",
+    "bench:suite": "node bench/suite.js 200"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "UNLICENSED",
+  "author": "STMZ Kinetic <support@stmzkinetic.com>"
+}
